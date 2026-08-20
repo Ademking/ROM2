@@ -246,6 +246,7 @@ import {
   WAVE_BREAK_FRAMES,
   WAVE_CAPTION_FRAMES,
   formatSurvivalTime,
+  rollSurvivalDrops,
   survivalResultColumns,
   survivalScene,
   survivalWave,
@@ -4266,6 +4267,10 @@ class RageOfMagicGame {
         '500',
         `w${e}-${n}`,
       ]);
+      // Loot rides along on the enemy; the engine spills it when the enemy dies.
+      rollSurvivalDrops(r.boss).forEach((a) =>
+        this.runSceneCommand('scene-actor-add-pickup', [`w${e}-${n}`, a]),
+      );
     });
     (this.runSceneCommand('scene-run', []),
       this.runSceneCommand('scene-set-actor-process-ai', []),

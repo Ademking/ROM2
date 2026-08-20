@@ -179,6 +179,42 @@ function survivalWave(wave) {
 }
 
 /**
+ * What a downed enemy leaves behind. Weights are relative: food and potions are
+ * the everyday drops, the run-changing ones (fairy, level, life) are rare. The
+ * pool is flattened once so a drop is a single random index.
+ */
+const SURVIVAL_DROP_WEIGHTS = {
+  apple: 30,
+  drumstick: 30,
+  dinner: 16,
+  hp: 22,
+  mp: 18,
+  sp: 14,
+  coin: 10,
+  rage: 6,
+  absorb: 5,
+  refract: 4,
+  fairy: 3,
+  level: 2,
+  life: 1,
+};
+const SURVIVAL_DROP_POOL = Object.entries(SURVIVAL_DROP_WEIGHTS).flatMap(([name, weight]) =>
+  Array(weight).fill(name),
+);
+/** Odds an ordinary enemy drops anything at all. Bosses always drop, three times. */
+const DROP_CHANCE = 0.35;
+const BOSS_DROPS = 3;
+
+/** The drops one dead enemy leaves: nothing, usually; a small pile from a boss. */
+function rollSurvivalDrops(boss = !1) {
+  const rolls = boss ? BOSS_DROPS : Number(Math.random() < DROP_CHANCE);
+  return Array.from(
+    { length: rolls },
+    () => SURVIVAL_DROP_POOL[Math.floor(Math.random() * SURVIVAL_DROP_POOL.length)],
+  );
+}
+
+/**
  * The scene script. Setup mirrors an arena stage: create the squad, run a frame,
  * caption, fade in — then the fight script switches the actors to AI and turns
  * damage on, and the wave spawner takes it from there.
@@ -226,6 +262,7 @@ export {
   WAVE_BREAK_FRAMES,
   WAVE_CAPTION_FRAMES,
   formatSurvivalTime,
+  rollSurvivalDrops,
   survivalResultColumns,
   survivalScene,
   survivalWave,
