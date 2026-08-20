@@ -74,14 +74,13 @@ function stepGame() {
 }
 
 function showStartCover() {
-  showCover(
-    'start-cover',
-    '<button type="button">Play Rage of Magic II</button>'
-  );
+  showCover('start-cover', '<button type="button">Play Rage of Magic II</button>');
   cover.querySelector('button').addEventListener('click', () => {
     cover.hidden = true;
     leftover = 0;
-    game.start();
+    // start() unlocks audio inside the click, then loads the rest of the assets
+    // behind the game's own loading bar.
+    game.start()?.catch(showError);
     app.canvas.focus();
   });
 }
@@ -110,7 +109,7 @@ async function boot() {
   game = new RageOfMagicGame({
     pixelPerfect,
     renderer: app.renderer,
-    onStateChange: () => { },
+    onStateChange: () => {},
     onOpenHighScores: (url) => window.open(url, '_blank', 'noopener,noreferrer'),
   });
   app.stage.addChild(game.root);
@@ -126,10 +125,13 @@ async function boot() {
   showStartCover();
 }
 
-boot().catch((error) => {
+function showError(error) {
   showCover(
     'error-cover',
-    `<strong>Couldn’t start Rage of Magic II.</strong><span>${error instanceof Error ? error.message : 'The game could not be loaded.'
+    `<strong>Couldn’t start Rage of Magic II.</strong><span>${
+      error instanceof Error ? error.message : 'The game could not be loaded.'
     }</span>`,
   );
-});
+}
+
+boot().catch(showError);

@@ -65,7 +65,6 @@ import {
   FONT_INDEX,
   GAME_KEYS,
   HUE_RAMP,
-  MENU_MUSIC,
   ONLINE_SCORE_URLS,
   PICKUP_ICONS,
   PICKUP_NAMES,
@@ -451,6 +450,9 @@ class RageOfMagicGame {
   logoSkipRequested = !1;
   introCharacterViews = new Map();
   startupLoad;
+  /** 0..1 across every asset loadAssets() fetches. Drives the loading bar. */
+  assetProgress = 0;
+  assetLoad;
   splashLayer;
   splashFilter;
   splashPrompt;
@@ -569,6 +571,10 @@ class RageOfMagicGame {
                       ? RESULT_SCREEN.rate
                       : this.sourceUpdateRate;
   }
+  /**
+   * Only what the in-game loading screen itself needs to draw. Everything else
+   * is fetched by loadAssets() while that screen is up, so its bar is real.
+   */
   async load() {
     const e = await fetch(assetPath('/games/rage-of-magic-ii/manifest.json', 'Game manifest'));
     if (!e.ok) throw new Error(`Could not load Rage of Magic II assets: ${e.status}`);
@@ -577,8 +583,24 @@ class RageOfMagicGame {
       this.manifest.nativeWidth !== SCREEN_WIDTH || this.manifest.nativeHeight !== SCREEN_HEIGHT)
     )
       throw new Error('Rage of Magic II manifest has an invalid native resolution');
+    // The sound files themselves are decoded by loadAssets(); the manifest is
+    // cheap and lists what there is to load.
     (await Promise.all([
-      this.audio.load('/audio/rage-of-magic/audio.json').then(() => this.audio.preload(MENU_MUSIC)),
+      this.audio.load('/audio/rage-of-magic/audio.json'),
+      this.ensureAtlas('ui.fonts'),
+    ]),
+      (this.loaded = !0),
+      this.emitState(!0));
+  }
+  /** Every remaining asset, reported through assetProgress as 0..1. */
+  async loadAssets() {
+    let failedSounds = 0;
+    const tasks = [
+      ...[...this.audio.configs.keys()].map((t) =>
+        this.audio.preload([t]).catch(() => {
+          failedSounds += 1;
+        }),
+      ),
       this.loadTexture(BRAND_LOGO_IMAGE).then((t) => this.images.set(RAGE_STARTUP_SOUND, t)),
       this.ensureImage('cover'),
       this.ensureImage('splash'),
@@ -601,35 +623,26 @@ class RageOfMagicGame {
       this.ensureImage('dialog'),
       this.ensureAtlas('pickup'),
       ...HEROES.map((t) => this.ensureAtlas(t.id)),
-    ]),
-      (this.loaded = !0),
-      this.emitState(!0));
+    ];
+    let done = 0;
+    (await Promise.all(
+      tasks.map((t) => t.then(() => (this.assetProgress = ++done / tasks.length))),
+    ),
+      failedSounds > 0 &&
+        console.warn(
+          `${failedSounds} sound(s) could not be preloaded; they will load on first use`,
+        ),
+      (this.assetProgress = 1));
   }
   start() {
     !this.loaded ||
       this.destroyed ||
       this.startupStarted ||
       ((this.startupStarted = !0),
-      this.audio.unlock([
-        '006a',
-        '006b',
-        'zap',
-        'ting',
-        'gling',
-        'click',
-        'movestone',
-        'error',
-        '005',
-        '009',
-        '007',
-        '008',
-        '010',
-        '011',
-        '012a',
-        '012b',
-        '100a',
-      ]),
-      this.startInitialLoad());
+      this.audio.unlock(),
+      this.startInitialLoad(),
+      (this.assetLoad = this.loadAssets()));
+    return this.assetLoad;
   }
   step() {
     if (!(!this.loaded || !this.startupStarted || this.destroyed)) {
@@ -1712,6 +1725,12 @@ class RageOfMagicGame {
     if (!e) return;
     if (e.phase === 'load') {
       const i = stepLoading(e.state);
+      // Hold the bar on screen, filling, until every asset is in memory. Leaving
+      // e.state alone re-runs this same decision on the next frame.
+      if (i.action === 'begin-fade' && this.assetProgress < 1) {
+        this.renderStaticScreen();
+        return;
+      }
       ((e.state = i.state),
         i.action === 'draw'
           ? this.renderStaticScreen()
@@ -9020,7 +9039,7 @@ class RageOfMagicGame {
             title: this.sceneTitle || null,
             subtitle: this.sceneSubtitle || null,
             owner: i.owner,
-            percent: this.startupLoad || this.sceneTransition?.prepared ? 1 : 0,
+            percent: this.startupLoad ? this.assetProgress : this.sceneTransition?.prepared ? 1 : 0,
             fullEdition: this.edition === 'full',
             visible: this.startupLoad
               ? this.startupLoad.state.delay >= this.startupLoad.state.initialDelay

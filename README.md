@@ -223,7 +223,7 @@ The engine came out of a minified bundle, so it is readable but not yet finished
 - ⚠️ Variables **inside** function bodies are still the minifier's `s, e, t, i, r, n` — around 1400
   of them
 
-`npm run check` prints the running count, and `node tools/todo.mjs` shows exactly where they are.
+`npm run check` prints the running count.
 Nothing depends on fixing them; they can be cleaned up module by module, which makes it an easy
 first contribution.
 
