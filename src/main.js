@@ -76,8 +76,7 @@ function stepGame() {
 function showStartCover() {
   showCover(
     'start-cover',
-    '<button type="button">Play Rage of Magic II</button>' +
-    '<span>Enables the restored voice, music, and sound effects</span>',
+    '<button type="button">Play Rage of Magic II</button>'
   );
   cover.querySelector('button').addEventListener('click', () => {
     cover.hidden = true;
