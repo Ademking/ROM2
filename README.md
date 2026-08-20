@@ -143,10 +143,17 @@ around. Press any game button to open the menu.
 The first thing this project adds to the game. It sits in the main menu under
 **Survival Mode → Begin Survival**.
 
-Pick your character from the full roster — every ally in the game is unlocked, with
-750 coins to build a squad — then hold an arena against waves that never stop. Each
-wave brings more enemies, higher levels and tougher company, with a boss every fifth
-wave. It ends when you do.
+It opens straight on the character grid — **all 37 characters in the game on one screen**,
+heroes first, then everyone from the Swordsman to the Dragon. Pick one and you are in: no
+coins, no ally shop, just the character you chose, with their own stats, sprites and moves.
+Characters the original select screen never had to draw get an avatar cropped from their
+own sprite sheet.
+
+Then hold the arena against waves that never stop. Each wave brings more enemies, higher
+levels and tougher company, with a boss every fifth wave. The wave count and your time run
+in the corner; when you fall, the summary shows how far you got and your best run so far,
+which is kept between sessions. You can also leave any time with **Exit Survival** from the
+pause menu (<kbd>Q</kbd>).
 
 The scene lives in [`survival.js`](src/games/rage-of-magic/survival.js) as an ordinary
 scene script, so it is also a worked example of adding new content to the engine.

@@ -26,6 +26,15 @@ const PLAYER_ICONS = {
   height: 24,
   gutter: 1,
 };
+/** The 24x24 hero faces the in-game stats bar uses. */
+const HERO_AVATARS = {
+  atlas: 'ui.stats',
+  sourceFrame: 5,
+  across: 3,
+  width: 24,
+  height: 24,
+  gutter: 1,
+};
 const SELECT_ICONS = {
   atlas: 'ui.plricon',
   sourceFrame: 1,
@@ -88,6 +97,7 @@ export {
   HERO_PORTRAITS,
   HERO_PORTRAITS_SMALL,
   NATIVE_SIZE,
+  HERO_AVATARS,
   PLAYER_ICONS,
   SELECT_ICONS,
   SMALL_DIGITS,

@@ -1,5 +1,4 @@
 import { ALLY_COSTS, ALLY_LIMITS } from '../scoring.js';
-import { SURVIVAL_COINS } from '../survival.js';
 import {
   HERO_LAUGH_SOUNDS,
   HERO_NAMES,
@@ -30,6 +29,10 @@ function newSelectPlayer(s, e = {}) {
     controller: s,
     win: 0,
     loss: 0,
+    /** Survival only: the grid character to play as, instead of a hero. */
+    characterActor: null,
+    characterLabel: null,
+    pickingCharacter: !1,
     selectList: Array.from(
       {
         length: SELECT_ENTRIES.length,
@@ -97,10 +100,7 @@ function selectAvailability(s, e, t, i) {
   const r = SELECT_ENTRIES.map((o) => o.index >= SELECT_COLUMNS);
   let n = 0,
     a = SELECT_COLUMNS;
-  // Survival has no campaign behind it to unlock things, so it opens with the
-  // whole roster on the table.
-  if (s === 'survival') ((n = 5), (a = r.length));
-  else if (s === 'versus') ((n = 5), (a = SELECT_COLUMNS * (t + 2)));
+  if (s === 'versus') ((n = 5), (a = SELECT_COLUMNS * (t + 2)));
   else if (s === 'arena') {
     n = 3;
     let o = 1;
@@ -166,7 +166,7 @@ function stepPanel(s, e, t) {
       (a &&
         ((a.mode = r.command === 'mode-loadout' ? 1 : 0),
         (a.cursorX = 0),
-        (a.cursorY = r.command === 'mode-loadout' ? 5 : a.character)),
+        (a.cursorY = r.command === 'mode-loadout' ? (a.pickingCharacter ? 1 : 5) : a.character)),
         (n = !0));
     } else if (r.onTarget) n = !0;
     else if (r.time >= r.steps) {
@@ -199,7 +199,7 @@ function newSelectState(s) {
           u = Math.trunc(c.coins),
           d = Math.trunc(c.align);
         s.mode === 'survival'
-          ? ((d = l + 1), (u = SURVIVAL_COINS), (h = h.map(() => 0)))
+          ? ((d = l + 1), (u = 0), (h = h.map(() => 0)), (c.pickingCharacter = !0))
           : s.mode === 'practice' || s.mode === 'tutorial'
             ? ((d = l + 1), (u = 150 * e), (h = h.map(() => 0)))
             : s.mode === 'versus'
@@ -223,9 +223,10 @@ function newSelectState(s) {
           win: Math.trunc(c.win),
           loss: Math.trunc(c.loss),
           selectList: h,
-          mode: 0,
+          // Survival opens straight on the character grid instead of the hero cards.
+          mode: c.pickingCharacter ? 1 : 0,
           cursorX: 0,
-          cursorY: p < 0 ? l : p,
+          cursorY: c.pickingCharacter ? 0 : p < 0 ? l : p,
           allyCount: f,
           selectDone: !1,
           totalCoins: m,
@@ -278,6 +279,8 @@ function newSelectState(s) {
       wins: e,
       title: selectTitle(s.mode, s.replay, Math.trunc(s.chapter)),
       selectLocks: t.locks,
+      /** Survival's pick grid; empty for every other mode. */
+      characters: s.characters ?? [],
       maxAllies: r,
       hints: s.hints ?? !0,
       controllerCount: Math.max(
@@ -360,7 +363,60 @@ function openSelectPanel(s, e, t) {
     t,
   );
 }
+/** "Swordsman", not "Swordsman Swordsman": some characters are their own race. */
+function characterName(s) {
+  return s.race && s.race !== s.name ? `${s.name} ${s.race}` : s.name;
+}
+/** The character pick: one grid holding every character, and no shopping yet. */
+function stepSelectCharacterPick(s, e, t, i) {
+  if (e.selectDone) return;
+  const r = Math.max(1, Math.ceil(s.characters.length / SELECT_COLUMNS)),
+    n = Math.sign(t.x ?? 0),
+    a = Math.sign(t.y ?? 0);
+  if (n !== 0) {
+    ((e.cursorX = (e.cursorX + n + SELECT_COLUMNS) % SELECT_COLUMNS),
+      i.push({
+        type: 'audio',
+        id: 'click',
+      }));
+    return;
+  }
+  if (a !== 0) {
+    ((e.cursorY = (e.cursorY + a + r) % r),
+      i.push({
+        type: 'audio',
+        id: 'click',
+      }));
+    return;
+  }
+  if (t.button === void 0) return;
+  const o = s.characters[e.cursorY * SELECT_COLUMNS + e.cursorX];
+  if (!o) {
+    (setSelectMessage(e, 1, 'Choose A Character!'),
+      i.push({
+        type: 'audio',
+        id: 'error',
+      }));
+    return;
+  }
+  // There is no shopping afterwards: the pick is the whole screen.
+  (o.hero === void 0
+    ? (e.characterActor = o.id)
+    : ((e.character = o.hero), (e.characterActor = null)),
+    (e.characterLabel = characterName(o)),
+    (e.pickingCharacter = !1),
+    (e.selectDone = !0),
+    setSelectMessage(e, 1, `Playing As ${o.name}`),
+    i.push({
+      type: 'audio',
+      id: 'gling',
+    }));
+}
 function stepSelectButtons(s, e, t, i, r) {
+  if (e.pickingCharacter) {
+    stepSelectCharacterPick(s, e, t, r);
+    return;
+  }
   if (e.selectDone) {
     t.button === 3 &&
       (r.push({
@@ -406,6 +462,7 @@ function stepSelectButtons(s, e, t, i, r) {
     return;
   }
   if (t.button === void 0) return;
+
   if (e.cursorY > 4) {
     ((e.selectDone = !0),
       r.push({
@@ -684,6 +741,10 @@ function selectMessage(s, e, t) {
       ? 'Nothing Selected'
       : `${selectEntryLabel(i.cursorX)} = ${ALLY_COSTS[i.cursorX]} Coins`;
   const a = i.cursorX + i.cursorY * SELECT_COLUMNS;
+  if (i.pickingCharacter) {
+    const o = s.characters[a];
+    return o ? characterName(o) : 'Nothing Selected';
+  }
   return a < 7 || a >= SELECT_ENTRIES.length
     ? 'Nothing Selected'
     : s.selectLocks[a]
@@ -695,7 +756,10 @@ function selectControllerLines(s, e) {
   if (!t) return [];
   if (!t.didJoin) return ['Press Any Button', 'Using Any Controller'];
   const i = t.selectList[SELECT_LEVEL_SLOT] ?? 0,
-    r = `${HERO_NAMES[t.character]} ${i > 0 ? `L${i} ` : ''}${HERO_RACES[t.character]}`;
+    r = t.characterLabel
+      ? `${t.characterLabel}${i > 0 ? ` L${i}` : ''}`
+      : `${HERO_NAMES[t.character]} ${i > 0 ? `L${i} ` : ''}${HERO_RACES[t.character]}`;
+  if (s.mode === 'survival') return [r];
   let n = `Coins: ${t.coins}/${t.totalCoins}`;
   s.mode !== 'practice' && !s.replay && (n += `, Score: ${t.score}`);
   let a = `Allies: ${t.allyCount}/${s.maxAllies}`;

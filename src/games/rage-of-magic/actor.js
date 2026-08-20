@@ -12,6 +12,14 @@ const MIN_HIT_OVERLAP = 5;
 const HP_PER_LEVEL = 10;
 const SPL_SPEED_BONUS = 0.075;
 const RESIST_BASE = 7;
+/**
+ * What a failed super costs a character whose sprite has no fail animation to
+ * play. Every hero's "Super Attack Fail" charges the same 5 hp, and the frames
+ * it spends playing are what stops a hero mashing the button — measured at about
+ * one attempt a second — so the wait below stands in for that.
+ */
+const FAILURE_HP_COST = 5;
+const FAILURE_WAIT_FRAMES = 40;
 const QUAKE_STEPS = 5;
 const ACTOR_NAME_CACHE = new WeakMap();
 function pickActorName(s, e, t) {
@@ -120,6 +128,8 @@ class Actor {
   frames = new Map();
   stances = new Map();
   resourceFailure;
+  /** Frames left of the stand-in for a missing fail animation. */
+  failureWait = 0;
   rageDepletedFeedback = !1;
   superLevelGainedFeedback = !1;
   constructor(e, t) {
@@ -279,15 +289,31 @@ class Actor {
     if (e === -2) return ((this.removed = !0), !0);
     let i = this.action(e);
     if (!i) return !1;
-    if (!t && i.cost.length > 0 && i.onFailure >= 0) {
+    // The cost check used to be skipped when an action had no fallback, which was
+    // safe while these actors were AI-only: the AI never picks a move it cannot
+    // afford. Under a player it let supers like Leoric's fire on an empty bar.
+    if (!t && i.cost.length > 0 && (i.onFailure >= 0 || this.controllerKind === 'player')) {
       const c = (i.cost[1] ?? 0) > this.mp,
         h = !c && (i.cost[2] ?? 0) > this.spl;
-      if (
-        (c || h) &&
-        ((this.resourceFailure = c ? 'magic' : 'super'),
-        i.onFailure < 0 || ((e = i.onFailure), (i = this.action(e)), !i))
-      )
-        return !1;
+      if (c || h) {
+        if (i.onFailure >= 0) {
+          if (
+            ((this.resourceFailure = c ? 'magic' : 'super'),
+            (e = i.onFailure),
+            (i = this.action(e)),
+            !i)
+          )
+            return !1;
+        } else {
+          // No fail animation to fall into. Take the hit a hero would take, then
+          // stay quiet for as long as one would have been busy failing.
+          if (this.failureWait > 0) return !1;
+          ((this.failureWait = FAILURE_WAIT_FRAMES),
+            (this.resourceFailure = c ? 'magic' : 'super'),
+            this.applySelfDamage(FAILURE_HP_COST, 0, 0));
+          return !1;
+        }
+      }
     }
     const r = this.actionPreflight?.(e) ?? e;
     if (r !== e && ((e = r), (i = this.action(e)), !i)) return !1;

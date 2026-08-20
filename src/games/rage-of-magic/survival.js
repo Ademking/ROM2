@@ -10,8 +10,6 @@ const SURVIVAL_DATA_NAME = 'extra';
 const SURVIVAL_SCRIPT = 900;
 /** The script the setup hands over to once the opening caption is done. */
 const SURVIVAL_FIGHT_SCRIPT = 901;
-/** Coins to spend on the select screen. Enough for a real squad. */
-const SURVIVAL_COINS = 750;
 /** Frames of quiet between clearing a wave and the next one dropping in. */
 const WAVE_BREAK_FRAMES = 40;
 const WAVE_CAPTION_FRAMES = 60;
@@ -21,6 +19,101 @@ const WAVES_PER_TIER = 4;
 const WAVES_PER_LEVEL = 3;
 const MAX_ENEMY_LEVEL = 9;
 const BOSS_EVERY = 5;
+
+/**
+ * The run summary panel: one of the game's own message forms, so the screen
+ * looks like the rest of the game rather than a black box. Sizes are only a
+ * fallback for when the atlas has not loaded.
+ */
+const SURVIVAL_RESULT = {
+  form: 11,
+  width: 359,
+  height: 132,
+};
+
+/** Columns on the character pick grid; the same width the ally grid uses. */
+const SURVIVAL_GRID_COLUMNS = 7;
+
+/**
+ * Every character in the game, in pick-grid order, with where its 24x24 avatar
+ * comes from:
+ *   hero - the three portraits the in-game stats bar uses (ui.stats frame 5)
+ *   icon - a cell on the select screen's own icon sheet
+ *   neither - cropped from the character's sprite sheet, for the ones the
+ *             original select screen never had to draw
+ */
+const SURVIVAL_CHARACTERS = [
+  { id: 'az', hero: 0 },
+  { id: 'wren', hero: 1 },
+  { id: 'luc', hero: 2 },
+  { id: 'sol', icon: 7 },
+  { id: 'sola', icon: 8 },
+  { id: 'wolf', icon: 9 },
+  { id: 'mage', icon: 10 },
+  { id: 'aco', icon: 11 },
+  { id: 'cler', icon: 12 },
+  { id: 'knt', icon: 13 },
+  { id: 'wara', icon: 14 },
+  { id: 'warb', icon: 15 },
+  { id: 'pig', icon: 16 },
+  { id: 'amaz', icon: 17 },
+  { id: 'amaza', icon: 18 },
+  { id: 'athf', icon: 19 },
+  { id: 'amag', icon: 20 },
+  { id: 'orc', icon: 21 },
+  { id: 'orca', icon: 22 },
+  { id: 'baka', icon: 23 },
+  { id: 'grisa', icon: 24 },
+  { id: 'ogre', icon: 25 },
+  { id: 'troll', icon: 26 },
+  { id: 'dlrd', icon: 27 },
+  { id: 'tom', icon: 28 },
+  { id: 'leo', icon: 29 },
+  { id: 'puck', icon: 30 },
+  { id: 'mwa', icon: 31 },
+  { id: 'sda', icon: 32 },
+  { id: 'dor', icon: 33 },
+  { id: 'strd', icon: 34 },
+  { id: 'war' },
+  { id: 'eva' },
+  { id: 'gris' },
+  { id: 'fau' },
+  { id: 'draco' },
+  { id: 'serp' },
+];
+
+/** mm:ss, counting past an hour rather than wrapping. */
+function formatSurvivalTime(e) {
+  const t = Math.max(0, Math.trunc(e));
+  return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`;
+}
+
+/**
+ * The run summary as label/value rows, so the panel can lay them out in two
+ * columns rather than as one centred blob.
+ */
+function survivalResultRows(e) {
+  return [
+    {
+      label: 'Waves Survived',
+      value: String(e.waves),
+    },
+    {
+      label: 'Time Survived',
+      value: formatSurvivalTime(e.seconds),
+    },
+    {
+      label: 'Best Waves',
+      value: String(e.bestWaves),
+      best: !0,
+    },
+    {
+      label: 'Best Time',
+      value: formatSurvivalTime(e.bestSeconds),
+      best: !0,
+    },
+  ];
+}
 
 /** Who turns up, roughly weakest tier first. */
 const SURVIVAL_TIERS = [
@@ -80,10 +173,9 @@ function survivalScene() {
       7: 'scene-create-pickup|mp|256|110|500|s2',
       8: 'scene-create-pickup|sp|336|110|500|s3',
       9: 'scene-run',
-      10: 'scene-create-player-allies|1',
-      11: 'scene-caption-open|100|SURVIVAL',
-      12: 'scene-fade-in',
-      13: `script-trigger-caption-done|${SURVIVAL_FIGHT_SCRIPT}`,
+      10: 'scene-caption-open|100|SURVIVAL',
+      11: 'scene-fade-in',
+      12: `script-trigger-caption-done|${SURVIVAL_FIGHT_SCRIPT}`,
       title: 'SURVIVAL',
       subtitle: 'Endless Waves',
       'scene-images': 'sc-arena-1a',
@@ -92,10 +184,9 @@ function survivalScene() {
     },
     [SURVIVAL_FIGHT_SCRIPT]: {
       1: 'scene-set-actor-process-ai',
-      2: 'scene-create-player-bonus|1',
-      3: 'scene-stats-set|Y|0',
-      4: 'game-music-play|002b',
-      5: 'scene-damage|Y',
+      2: 'scene-stats-set|Y|0',
+      3: 'game-music-play|002b',
+      4: 'scene-damage|Y',
     },
   };
 }
@@ -103,11 +194,15 @@ function survivalScene() {
 export {
   BOSS_EVERY,
   SURVIVAL_ACTORS,
-  SURVIVAL_COINS,
+  SURVIVAL_CHARACTERS,
   SURVIVAL_DATA_NAME,
+  SURVIVAL_GRID_COLUMNS,
+  SURVIVAL_RESULT,
   SURVIVAL_SCRIPT,
   WAVE_BREAK_FRAMES,
   WAVE_CAPTION_FRAMES,
+  formatSurvivalTime,
+  survivalResultRows,
   survivalScene,
   survivalWave,
 };

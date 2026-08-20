@@ -169,16 +169,18 @@ function buildOptionsMenu(s) {
             optionItem('Select Screen', 'select-screen'),
             optionItem('Exit Practice', 'exit-practice'),
           )
-        : s.mode === 'tutorial'
-          ? c.items.push(optionItem('Exit Tutorial', 'exit-tutorial'))
-          : s.mode === 'versus'
-            ? c.items.push(
-                optionItem('Select Versus', 'select-versus'),
-                optionItem('Exit Versus', 'exit-versus'),
-              )
-            : s.mode === 'arena' &&
-              (s.replay && c.items.push(optionItem('Select Replay', 'select-replay')),
-              c.items.push(optionItem('Exit Arena', 'exit-arena'))),
+        : s.mode === 'survival'
+          ? c.items.push(optionItem('Exit Survival', 'exit-survival'))
+          : s.mode === 'tutorial'
+            ? c.items.push(optionItem('Exit Tutorial', 'exit-tutorial'))
+            : s.mode === 'versus'
+              ? c.items.push(
+                  optionItem('Select Versus', 'select-versus'),
+                  optionItem('Exit Versus', 'exit-versus'),
+                )
+              : s.mode === 'arena' &&
+                (s.replay && c.items.push(optionItem('Select Replay', 'select-replay')),
+                c.items.push(optionItem('Exit Arena', 'exit-arena'))),
     c
   );
 }

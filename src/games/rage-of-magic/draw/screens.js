@@ -2,6 +2,7 @@ import {
   GUI_ICONS,
   GUI_PANELS,
   HERO_PORTRAITS,
+  HERO_AVATARS,
   HERO_PORTRAITS_SMALL,
   NATIVE_SIZE,
   PLAYER_ICONS,
@@ -594,6 +595,77 @@ function pushSelectHighlight(s, e, t, i, r, n, a) {
         atlasCell(SELECT_ICONS, a ? 9 : 4, r, n),
       ));
 }
+/**
+ * One cell of the character pick grid. The avatar comes from the stats bar for a
+ * hero, the select sheet for a character that has an icon there, and the
+ * character's own sprite for everyone else.
+ */
+function pushCharacterCell(s, e, t, i, r, n, a) {
+  const o = e.players[t],
+    l = o.cursorY * SELECT_COLUMNS + o.cursorX === a,
+    c = l ? 'full' : 'faded';
+  (s.push(
+    {
+      kind: 'canvas-effect',
+      effect: 'half-rect',
+      amount: 0.5,
+      x: i + 2,
+      y: r + 3,
+      width: 24,
+      height: 23,
+    },
+    atlasCell(SELECT_ICONS, 0, i, r),
+  ),
+    n &&
+      s.push(
+        n.hero !== void 0
+          ? atlasCell(HERO_AVATARS, n.hero, i + 2, r + 3, iconTreatment(c))
+          : n.icon !== void 0
+            ? atlasCell(PLAYER_ICONS, n.icon, i + 2, r + 3, iconTreatment(c))
+            : {
+                kind: 'actor-icon',
+                actorId: n.id,
+                frame: 0,
+                x: i + 2,
+                y: r + 3,
+                size: 24,
+                ...iconTreatment(c),
+              },
+      ),
+    s.push(atlasCell(SELECT_ICONS, 2, i, r)));
+}
+/** The pick grid: every character in the game, seven to a row. */
+function drawCharacterGrid(s, e, t, i, r, n) {
+  const a = s.players[e],
+    o = e === 1 ? SELECT_COLUMNS * (SELECT_ICONS.width - 1) : 0,
+    l = Math.max(1, Math.ceil(s.characters.length / SELECT_COLUMNS));
+  let c = i;
+  for (let h = 0; h < l; h += 1)
+    for (let u = 0; u < SELECT_COLUMNS; u += 1) {
+      const d = h * SELECT_COLUMNS + u;
+      pushCharacterCell(t, s, e, r + u * 27 - o, c + h * 29, s.characters[d], d);
+    }
+  (a.didJoin &&
+    !a.selectDone &&
+    t.push(
+      atlasCell(SELECT_ICONS, 3 + n, r + a.cursorX * 27 - o, c + a.cursorY * 29),
+      atlasCell(SMALL_DIGITS, n, e === 1 ? r + 2 : r - 13, c + a.cursorY * 29 + 6, {
+        flipX: e === 1,
+      }),
+    ),
+    (c += l * 29 + 3),
+    t.push(sideText(e, 'small-white', a.selectDone ? 'Get Ready' : 'Choose Your Character', r, c)),
+    (c += 12),
+    t.push(
+      sideText(
+        e,
+        a.messages[1].delay > 0 ? 'small-red' : 'small-blue',
+        selectMessage(s, e, 'ally'),
+        r,
+        c,
+      ),
+    ));
+}
 function drawSelectPanel(s, e, t, i, r) {
   const n = s.players[e],
     a = e === 1,
@@ -605,6 +677,9 @@ function drawSelectPanel(s, e, t, i, r) {
     (l.push(sideText(e, 'small-white', d, t, h)), (h += 11));
   }),
     (h = i + (n.didJoin ? 65 : 54)));
+  // Survival has no shop, so its panel never turns into one — not even for the
+  // few frames between the pick and the screen fading out.
+  if (s.mode === 'survival') return (drawCharacterGrid(s, e, l, h, t, r), l);
   for (let d = 0; d < 7; d += 1) {
     const f = t + d * 27 - o;
     pushSelectHighlight(l, s, e, d, f, h, !0);
