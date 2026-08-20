@@ -2,6 +2,7 @@ const PLAY_MODES = new Set([
   'arcade',
   'arena',
   'practice',
+  'survival',
   'tutorial',
   'versus',
   'show',

@@ -103,6 +103,11 @@ function buildMainMenu(s = {}) {
     p = [
       submenuItem('Arcade Mode', n, 'Story 1 Player Missions'),
       submenuItem('Arena Mode', a, 'Quick 1 or 2 Player Coop Action'),
+      submenuItem(
+        'Survival Mode',
+        [menuItem('Begin Survival', 'survival')],
+        'Endless Waves Of Enemies',
+      ),
       submenuItem('Extra Modes', [
         menuItem('Start Tutorial', 'tutorial'),
         menuItem('Practice Mode', 'practice'),

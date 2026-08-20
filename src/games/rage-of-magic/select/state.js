@@ -1,4 +1,5 @@
 import { ALLY_COSTS, ALLY_LIMITS } from '../scoring.js';
+import { SURVIVAL_COINS } from '../survival.js';
 import {
   HERO_LAUGH_SOUNDS,
   HERO_NAMES,
@@ -81,6 +82,7 @@ function normalizeSelectList(s) {
   );
 }
 function selectTitle(s, e, t) {
+  if (s === 'survival') return 'SURVIVAL MODE';
   if (s === 'practice') return 'PRACTICE MODE';
   if (s === 'tutorial') return 'START TUTORIAL';
   if (s === 'versus') return `PLAYER VERSUS${t > 1 ? ` ROUND ${t}` : ''}`;
@@ -95,7 +97,10 @@ function selectAvailability(s, e, t, i) {
   const r = SELECT_ENTRIES.map((o) => o.index >= SELECT_COLUMNS);
   let n = 0,
     a = SELECT_COLUMNS;
-  if (s === 'versus') ((n = 5), (a = SELECT_COLUMNS * (t + 2)));
+  // Survival has no campaign behind it to unlock things, so it opens with the
+  // whole roster on the table.
+  if (s === 'survival') ((n = 5), (a = r.length));
+  else if (s === 'versus') ((n = 5), (a = SELECT_COLUMNS * (t + 2)));
   else if (s === 'arena') {
     n = 3;
     let o = 1;
@@ -193,11 +198,13 @@ function newSelectState(s) {
         let h = normalizeSelectList(c.selectList),
           u = Math.trunc(c.coins),
           d = Math.trunc(c.align);
-        s.mode === 'practice' || s.mode === 'tutorial'
-          ? ((d = l + 1), (u = 150 * e), (h = h.map(() => 0)))
-          : s.mode === 'versus'
-            ? (d = l + 1)
-            : s.mode === 'arena' && (d = 1);
+        s.mode === 'survival'
+          ? ((d = l + 1), (u = SURVIVAL_COINS), (h = h.map(() => 0)))
+          : s.mode === 'practice' || s.mode === 'tutorial'
+            ? ((d = l + 1), (u = 150 * e), (h = h.map(() => 0)))
+            : s.mode === 'versus'
+              ? (d = l + 1)
+              : s.mode === 'arena' && (d = 1);
         let f = 0,
           m = u;
         h.forEach((g, v) => {
@@ -507,15 +514,17 @@ function stepSelectCursor(s, e, t, i, r) {
 }
 function selectModeLabel(s) {
   const e =
-    s === 'versus'
-      ? 'Versus'
-      : s === 'arena'
-        ? 'Arena'
-        : s === 'practice'
-          ? 'Practice'
-          : s === 'tutorial'
-            ? 'Tutorial'
-            : null;
+    s === 'survival'
+      ? 'Survival'
+      : s === 'versus'
+        ? 'Versus'
+        : s === 'arena'
+          ? 'Arena'
+          : s === 'practice'
+            ? 'Practice'
+            : s === 'tutorial'
+              ? 'Tutorial'
+              : null;
   return e
     ? {
         kind: 'question',

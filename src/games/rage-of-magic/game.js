@@ -236,6 +236,14 @@ import {
 import { assetPath } from '../../lib/asset-path.js';
 import { AudioLibrary } from '../../lib/audio-library.js';
 import { BRAND_LOGO_IMAGE, BRAND_LOGO_SCALE } from '../../lib/brand-intro.js';
+import {
+  SURVIVAL_DATA_NAME,
+  SURVIVAL_SCRIPT,
+  WAVE_BREAK_FRAMES,
+  WAVE_CAPTION_FRAMES,
+  survivalScene,
+  survivalWave,
+} from './survival.js';
 import { centeredFitRect } from '../../lib/canvas-fit.js';
 class RageOfMagicGame {
   root = new Container();
@@ -450,6 +458,9 @@ class RageOfMagicGame {
   logoSkipRequested = !1;
   introCharacterViews = new Map();
   startupLoad;
+  /** Which survival wave is on the field; 0 before the first one drops. */
+  survivalWave = 0;
+  survivalBreak = 0;
   /** 0..1 across every asset loadAssets() fetches. Drives the loading bar. */
   assetProgress = 0;
   assetLoad;
@@ -583,6 +594,10 @@ class RageOfMagicGame {
       this.manifest.nativeWidth !== SCREEN_WIDTH || this.manifest.nativeHeight !== SCREEN_HEIGHT)
     )
       throw new Error('Rage of Magic II manifest has an invalid native resolution');
+    // Survival is ours, not Tony's: its scene lives in source and joins the
+    // shipped scripts here, so the rest of the engine cannot tell the difference.
+    for (const [t, i] of Object.entries(survivalScene()))
+      this.manifest.data[SURVIVAL_DATA_NAME][`Script:${t}`] = i;
     // The sound files themselves are decoded by loadAssets(); the manifest is
     // cheap and lists what there is to load.
     (await Promise.all([
@@ -3305,6 +3320,17 @@ class RageOfMagicGame {
             script: 10,
           }),
         ));
+    else if (e === 'survival')
+      (this.resetNewMode('practice', 'survival'),
+        (this.survivalWave = 0),
+        (this.survivalBreak = 0),
+        this.beginMenuScreenFade(() =>
+          this.startHeroSelection('survival', {
+            kind: 'scene',
+            dataName: SURVIVAL_DATA_NAME,
+            script: SURVIVAL_SCRIPT,
+          }),
+        ));
     else if (e === 'practice')
       (this.resetNewMode('practice', 'practice'),
         this.beginMenuScreenFade(() =>
@@ -3439,7 +3465,9 @@ class RageOfMagicGame {
       (this.sourceMode = e),
       (this.heroDestination = t));
     const i =
-        e === 'arena' || e === 'practice' || e === 'tutorial' || e === 'versus' ? e : 'arcade',
+        e === 'arena' || e === 'practice' || e === 'survival' || e === 'tutorial' || e === 'versus'
+          ? e
+          : 'arcade',
       r = i === 'arena' ? this.progress.arenaPlayer : this.progress.arcadePlayer,
       n = i === 'arena' ? normalizePlayerProgress(this.progress.arenaPlayer2, 1) : void 0,
       a = e === 'versus' && this.selectedPlayers.length >= 2 ? this.selectedPlayers : void 0,
@@ -3727,7 +3755,12 @@ class RageOfMagicGame {
         c = HEROES[l].id;
       r.add(c);
       const h = o.color > 0 ? HERO_PALETTES[l]?.[o.color - 1] : void 0;
-      if ((h && r.add(`${c}.${h}`), this.sourceMode === 'arena' || this.sourceMode === 'versus')) {
+      if (
+        (h && r.add(`${c}.${h}`),
+        this.sourceMode === 'arena' ||
+          this.sourceMode === 'survival' ||
+          this.sourceMode === 'versus')
+      ) {
         for (let u = 7; u < o.selectList.length; u += 1)
           if ((o.selectList[u] ?? 0) > 0 && ALLY_ACTOR_IDS[u]) {
             const d = ALLY_ACTOR_IDS[u];
@@ -4022,7 +4055,8 @@ class RageOfMagicGame {
     (this.prepareSourceSceneFrame(),
       this.renderScene(),
       this.finishSourceSceneFrame(!0),
-      this.processTriggers());
+      this.processTriggers(),
+      this.sourceMode === 'survival' && this.stepSurvival());
     const t = nextRouteAfterPlay({
       mode: this.sourceMode,
       gameStatus: this.statusValue,
@@ -4039,6 +4073,50 @@ class RageOfMagicGame {
       (this.playHelpRequested = !1),
       t.resetIntroLoop && (this.introLoop = 0),
       this.applySourcePlayRoute(t.route));
+  }
+  /** Survival runs as long as the player does: clear the field, get another wave. */
+  stepSurvival() {
+    if (this.survivalWave > 0 && this.playersNull()) {
+      this.beginPlayExitFade();
+      return;
+    }
+    if (!this.enemiesDead(!0)) {
+      this.survivalBreak = WAVE_BREAK_FRAMES;
+      return;
+    }
+    // A breather once the field is clear, and never while a caption is still up.
+    if (this.caption || this.survivalBreak > 0) {
+      this.survivalBreak = Math.max(0, this.survivalBreak - 1);
+      return;
+    }
+    this.startSurvivalWave();
+  }
+  startSurvivalWave() {
+    this.survivalWave += 1;
+    const e = this.survivalWave,
+      t = Math.trunc(this.cameraX) + 24,
+      i = Math.trunc(this.cameraX) + SCREEN_WIDTH - 24;
+    survivalWave(e).forEach((r, n) => {
+      // Alternate sides, spread them over the floor, and drop them in.
+      const a = n % 2 === 0;
+      this.runSceneCommand(r.boss ? 'scene-create-boss' : 'scene-create-fighter', [
+        r.main,
+        '0',
+        r.main,
+        String(r.level),
+        String(r.aiLevel),
+        '3',
+        a ? '1' : '-1',
+        String(a ? t : i),
+        String(Math.trunc((this.floorHeight * (1 + (n % 4))) / 5)),
+        '500',
+        `w${e}-${n}`,
+      ]);
+    });
+    (this.runSceneCommand('scene-run', []),
+      this.runSceneCommand('scene-set-actor-process-ai', []),
+      this.runSceneCommand('scene-caption-open', [String(WAVE_CAPTION_FRAMES), `WAVE ${e}`]),
+      this.playSound('gling'));
   }
   applySourcePlayRoute(e) {
     if (e !== 'none') {
@@ -6766,7 +6844,12 @@ class RageOfMagicGame {
     !t?.isLiving() || !i?.didJoin || this.addActorBonuses(t, i.selectList.slice(0, 6));
   }
   createChosenPlayerAllies(e) {
-    if (this.sourceMode !== 'arena' && this.sourceMode !== 'versus') return;
+    if (
+      this.sourceMode !== 'arena' &&
+      this.sourceMode !== 'survival' &&
+      this.sourceMode !== 'versus'
+    )
+      return;
     const t = this.chosenPlayerActor(e),
       i = this.selectedPlayerState(e);
     if (!t?.isLiving() || !i?.didJoin) return;
@@ -10181,13 +10264,15 @@ Press Enter to return`,
     const r =
         this.sourceMode === 'tutorial'
           ? 'START TUTORIAL'
-          : this.sourceMode === 'practice'
-            ? 'PRACTICE MODE'
-            : this.sourceMode === 'arena'
-              ? 'ARENA MODE'
-              : this.sourceMode === 'arcade'
-                ? 'ARCADE MODE'
-                : 'PLAYER SELECT',
+          : this.sourceMode === 'survival'
+            ? 'SURVIVAL MODE'
+            : this.sourceMode === 'practice'
+              ? 'PRACTICE MODE'
+              : this.sourceMode === 'arena'
+                ? 'ARENA MODE'
+                : this.sourceMode === 'arcade'
+                  ? 'ARCADE MODE'
+                  : 'PLAYER SELECT',
       n = this.sourceBitmapText(3, r);
     (n.container.position.set(Math.trunc((SCREEN_WIDTH - n.width) / 2), -n.height),
       e.addChild(n.container));

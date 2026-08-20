@@ -23,6 +23,7 @@ _A fan-made project born from nostalgia, curiosity, and a childhood wish to see 
 - [Then, 20 Years Later…](#-then-20-years-later)
 - [About This Project](#%EF%B8%8F-about-this-project)
 - [Getting Started](#%EF%B8%8F-getting-started)
+- [Survival Mode](#-survival-mode)
 - [Controls](#-controls)
 - [Project Structure](#-project-structure)
 - [Scripts](#-scripts)
@@ -134,6 +135,21 @@ around. Press any game button to open the menu.
 > ```
 >
 > `npm run assets` reports coverage at any time.
+
+---
+
+## 💀 Survival Mode
+
+The first thing this project adds to the game. It sits in the main menu under
+**Survival Mode → Begin Survival**.
+
+Pick your character from the full roster — every ally in the game is unlocked, with
+750 coins to build a squad — then hold an arena against waves that never stop. Each
+wave brings more enemies, higher levels and tougher company, with a boss every fifth
+wave. It ends when you do.
+
+The scene lives in [`survival.js`](src/games/rage-of-magic/survival.js) as an ordinary
+scene script, so it is also a worked example of adding new content to the engine.
 
 ---
 
