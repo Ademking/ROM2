@@ -19,10 +19,10 @@ _A fan-made project born from nostalgia, curiosity, and a childhood wish to see 
 
 ## 📖 Contents
 
-- [Why This Project Exists](#-why-this-project-exists)
+- [Why This Project Exists](#%EF%B8%8F-why-this-project-exists)
 - [Then, 20 Years Later…](#-then-20-years-later)
-- [About This Project](#-about-this-project)
-- [Getting Started](#-getting-started)
+- [About This Project](#%EF%B8%8F-about-this-project)
+- [Getting Started](#%EF%B8%8F-getting-started)
 - [Controls](#-controls)
 - [Project Structure](#-project-structure)
 - [Scripts](#-scripts)

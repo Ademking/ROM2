@@ -46,6 +46,7 @@ body {
 
 .canvas-host canvas {
   display: block;
+  outline: none;
 }
 
 .cover {
