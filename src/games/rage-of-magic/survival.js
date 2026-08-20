@@ -10,6 +10,8 @@ const SURVIVAL_DATA_NAME = 'extra';
 const SURVIVAL_SCRIPT = 900;
 /** The script the setup hands over to once the opening caption is done. */
 const SURVIVAL_FIGHT_SCRIPT = 901;
+/** The defeat voice the arena and arcade result screens use when you lose. */
+const SURVIVAL_DEATH_SOUND = '009';
 /** Frames of quiet between clearing a wave and the next one dropping in. */
 const WAVE_BREAK_FRAMES = 40;
 const WAVE_CAPTION_FRAMES = 60;
@@ -21,14 +23,42 @@ const MAX_ENEMY_LEVEL = 9;
 const BOSS_EVERY = 5;
 
 /**
- * The run summary panel: one of the game's own message forms, so the screen
- * looks like the rest of the game rather than a black box. Sizes are only a
- * fallback for when the atlas has not loaded.
+ * The run summary panel. The shipped message forms all carry their own header
+ * and button-row art, which nothing here needs, so this one is drawn: a dark
+ * slate card with gold corners, sized to its contents.
  */
 const SURVIVAL_RESULT = {
-  form: 11,
-  width: 359,
-  height: 132,
+  width: 320,
+  height: 146,
+  titleY: 8,
+  labelY: 46,
+  valueY: 58,
+  bestY: 88,
+  // The footer band runs from the lower rule to the panel edge; both of these
+  // centre their content in it, with or without the record line above.
+  recordY: 114,
+  promptY: 128,
+  promptOnlyY: 122,
+  headerHeight: 34,
+  rules: [36, 108],
+  colors: {
+    panel: 723479,
+    header: 1512740,
+    border: 4870244,
+    innerBorder: 2764600,
+    rule: 3552822,
+    gold: 15250250,
+  },
+};
+
+/**
+ * Backgrounds that are ours rather than Tony's, registered alongside the shipped
+ * images at load so the engine can request them like any other scene image.
+ */
+const SURVIVAL_IMAGES = {
+  'sc-survival': {
+    url: '/games/rage-of-magic-ii/images/sc-survival.jpg',
+  },
 };
 
 /** Columns on the character pick grid; the same width the ally grid uses. */
@@ -89,28 +119,20 @@ function formatSurvivalTime(e) {
 }
 
 /**
- * The run summary as label/value rows, so the panel can lay them out in two
- * columns rather than as one centred blob.
+ * The run summary as two figures, each with its own label and the record to
+ * beat, so the panel can show the numbers big instead of listing them.
  */
-function survivalResultRows(e) {
+function survivalResultColumns(e) {
   return [
     {
-      label: 'Waves Survived',
+      label: 'WAVES',
       value: String(e.waves),
+      best: `Best ${e.bestWaves}`,
     },
     {
-      label: 'Time Survived',
+      label: 'TIME',
       value: formatSurvivalTime(e.seconds),
-    },
-    {
-      label: 'Best Waves',
-      value: String(e.bestWaves),
-      best: !0,
-    },
-    {
-      label: 'Best Time',
-      value: formatSurvivalTime(e.bestSeconds),
-      best: !0,
+      best: `Best ${formatSurvivalTime(e.bestSeconds)}`,
     },
   ];
 }
@@ -178,9 +200,9 @@ function survivalScene() {
       12: `script-trigger-caption-done|${SURVIVAL_FIGHT_SCRIPT}`,
       title: 'SURVIVAL',
       subtitle: 'Endless Waves',
-      'scene-images': 'sc-arena-1a',
+      'scene-images': 'sc-survival',
       'resources-1': SURVIVAL_ACTORS.map((id) => `sprite.${id}`).join(','),
-      'resources-2': 'image.block.sc-arena-1a',
+      'resources-2': 'image.block.sc-survival',
     },
     [SURVIVAL_FIGHT_SCRIPT]: {
       1: 'scene-set-actor-process-ai',
@@ -196,13 +218,15 @@ export {
   SURVIVAL_ACTORS,
   SURVIVAL_CHARACTERS,
   SURVIVAL_DATA_NAME,
+  SURVIVAL_DEATH_SOUND,
   SURVIVAL_GRID_COLUMNS,
+  SURVIVAL_IMAGES,
   SURVIVAL_RESULT,
   SURVIVAL_SCRIPT,
   WAVE_BREAK_FRAMES,
   WAVE_CAPTION_FRAMES,
   formatSurvivalTime,
-  survivalResultRows,
+  survivalResultColumns,
   survivalScene,
   survivalWave,
 };

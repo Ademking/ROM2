@@ -149,6 +149,8 @@ const SELECT_SCREEN = {
   background: 'bg-select-1',
   iconOffColor: 1052688,
 };
+/** Where the panel sits when there is only one player, centring its grid. */
+const SELECT_SINGLE_PANEL_X = 161;
 const SELECT_LAYOUT = {
   title: {
     startY: -25,
@@ -190,6 +192,7 @@ export {
   SELECT_HUE_START,
   SELECT_HUE_STEP,
   SELECT_LAYOUT,
+  SELECT_SINGLE_PANEL_X,
   SELECT_LEVEL_SLOT,
   SELECT_MESSAGE_FRAMES,
   SELECT_SCREEN,

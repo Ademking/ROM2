@@ -240,11 +240,13 @@ import {
   SURVIVAL_CHARACTERS,
   SURVIVAL_RESULT,
   SURVIVAL_DATA_NAME,
+  SURVIVAL_DEATH_SOUND,
+  SURVIVAL_IMAGES,
   SURVIVAL_SCRIPT,
   WAVE_BREAK_FRAMES,
   WAVE_CAPTION_FRAMES,
   formatSurvivalTime,
-  survivalResultRows,
+  survivalResultColumns,
   survivalScene,
   survivalWave,
 } from './survival.js';
@@ -568,7 +570,7 @@ class RageOfMagicGame {
         : this.interstitial?.kind === 'poster'
           ? NOVEL_PAGE_DELAY_FRAMES
           : this.sceneTransition?.kind === 'load' &&
-            ['loading', 'loading-fade-out', 'activate'].includes(this.sceneTransition.phase)
+              ['loading', 'loading-fade-out', 'activate'].includes(this.sceneTransition.phase)
             ? 10
             : this.screen === 'logo'
               ? 20
@@ -577,14 +579,14 @@ class RageOfMagicGame {
                 : this.screen === 'splash'
                   ? 20
                   : this.screen === 'paused' ||
-                    this.screen === 'help' ||
-                    this.screen === 'menu' ||
-                    this.screen === 'hero' ||
-                    this.screen === 'select' ||
-                    this.screen === 'chapters' ||
-                    this.screen === 'scores' ||
-                    this.playQuestion ||
-                    this.versusEndFlow
+                      this.screen === 'help' ||
+                      this.screen === 'menu' ||
+                      this.screen === 'hero' ||
+                      this.screen === 'select' ||
+                      this.screen === 'chapters' ||
+                      this.screen === 'scores' ||
+                      this.playQuestion ||
+                      this.versusEndFlow
                     ? 30
                     : this.endResult
                       ? RESULT_SCREEN.rate
@@ -599,13 +601,15 @@ class RageOfMagicGame {
     if (!e.ok) throw new Error(`Could not load Rage of Magic II assets: ${e.status}`);
     if (
       ((this.manifest = await e.json()),
-        this.manifest.nativeWidth !== SCREEN_WIDTH || this.manifest.nativeHeight !== SCREEN_HEIGHT)
+      this.manifest.nativeWidth !== SCREEN_WIDTH || this.manifest.nativeHeight !== SCREEN_HEIGHT)
     )
       throw new Error('Rage of Magic II manifest has an invalid native resolution');
-    // Survival is ours, not Tony's: its scene lives in source and joins the
-    // shipped scripts here, so the rest of the engine cannot tell the difference.
+    // Survival is ours, not Tony's: its scene and background live in source and
+    // join the shipped data here, so the rest of the engine cannot tell the
+    // difference.
     for (const [t, i] of Object.entries(survivalScene()))
       this.manifest.data[SURVIVAL_DATA_NAME][`Script:${t}`] = i;
+    for (const [t, i] of Object.entries(SURVIVAL_IMAGES)) this.manifest.images[t] ??= i;
     // The sound files themselves are decoded by loadAssets(); the manifest is
     // cheap and lists what there is to load.
     (await Promise.all([
@@ -652,9 +656,9 @@ class RageOfMagicGame {
       tasks.map((t) => t.then(() => (this.assetProgress = ++done / tasks.length))),
     ),
       failedSounds > 0 &&
-      console.warn(
-        `${failedSounds} sound(s) could not be preloaded; they will load on first use`,
-      ),
+        console.warn(
+          `${failedSounds} sound(s) could not be preloaded; they will load on first use`,
+        ),
       (this.assetProgress = 1));
   }
   start() {
@@ -662,9 +666,9 @@ class RageOfMagicGame {
       this.destroyed ||
       this.startupStarted ||
       ((this.startupStarted = !0),
-        this.audio.unlock(),
-        this.startInitialLoad(),
-        (this.assetLoad = this.loadAssets()));
+      this.audio.unlock(),
+      this.startInitialLoad(),
+      (this.assetLoad = this.loadAssets()));
     return this.assetLoad;
   }
   step() {
@@ -739,8 +743,8 @@ class RageOfMagicGame {
                           : this.screen === 'playing'
                             ? this.stepPlaying()
                             : this.endResult &&
-                            (this.screen === 'clear' || this.screen === 'defeated') &&
-                            this.stepEndScreen(),
+                              (this.screen === 'clear' || this.screen === 'defeated') &&
+                              this.stepEndScreen(),
           this.emitState());
       }
     }
@@ -800,18 +804,18 @@ class RageOfMagicGame {
   beginUiScreenFade(e, t = !1) {
     this.uiScreenFade ||
       (this.clearAllSourceInputs(),
-        (this.uiScreenFade = {
-          step: 0,
-          steps: SPLASH_RATE,
-          continuation: e,
-          stopMusicOnFirstStep: t,
-          filter:
-            typeof document > 'u'
-              ? void 0
-              : new ColorMatrixFilter({
+      (this.uiScreenFade = {
+        step: 0,
+        steps: SPLASH_RATE,
+        continuation: e,
+        stopMusicOnFirstStep: t,
+        filter:
+          typeof document > 'u'
+            ? void 0
+            : new ColorMatrixFilter({
                 padding: 0,
               }),
-        }));
+      }));
   }
   beginMenuScreenFade(e) {
     this.beginUiScreenFade(e, !0);
@@ -821,7 +825,7 @@ class RageOfMagicGame {
     if (!e) return;
     if (
       (e.stopMusicOnFirstStep && ((e.stopMusicOnFirstStep = !1), this.stopCurrentMusic()),
-        !fadeDone(e.step, e.steps))
+      !fadeDone(e.step, e.steps))
     ) {
       (e.filter && this.setDisplayAdditiveHue(this.root, e.filter, fadeHue(e.step, e.steps)),
         (e.step += 1));
@@ -839,8 +843,8 @@ class RageOfMagicGame {
       if (
         (this.isSourceControllerCode(e) &&
           (this.screenControllerKeys.add(e),
-            this.screenReleaseLatch.poll(this.sourceControllerSnapshots())),
-          !this.menuSecretFade)
+          this.screenReleaseLatch.poll(this.sourceControllerSnapshots())),
+        !this.menuSecretFade)
       ) {
         if (this.menuSecretInput) {
           (this.keys.add(e),
@@ -849,7 +853,7 @@ class RageOfMagicGame {
                 ? ((this.menuSecretInput.help = !1), this.renderMenuSecretInput())
                 : this.closeMenuSecretInput()
               : e === 'F1' &&
-              ((this.menuSecretInput.help = !this.menuSecretInput.help),
+                ((this.menuSecretInput.help = !this.menuSecretInput.help),
                 this.clearAllSourceInputs(),
                 this.renderMenuSecretInput()));
           return;
@@ -882,11 +886,11 @@ class RageOfMagicGame {
           if (this.endResult && (this.screen === 'clear' || this.screen === 'defeated')) {
             (this.keys.add(e),
               e === 'KeyQ' &&
-              resultPanelY(this.endFrame).inputReady &&
-              (this.endQuestion || this.endPopup
-                ? this.closeEndModal()
-                : (this.clearAllSourceInputs(),
-                  this.applySourceEndEffects(saveQuestionEffects(this.endResult.mode)))));
+                resultPanelY(this.endFrame).inputReady &&
+                (this.endQuestion || this.endPopup
+                  ? this.closeEndModal()
+                  : (this.clearAllSourceInputs(),
+                    this.applySourceEndEffects(saveQuestionEffects(this.endResult.mode)))));
             return;
           }
           if (this.playQuestion) {
@@ -913,19 +917,19 @@ class RageOfMagicGame {
           if (this.screen === 'submit' || this.screen === 'input') {
             (this.keys.add(e),
               e === 'KeyQ' &&
-              (this.scoreFlowModal
-                ? this.closeScoreFlowModal()
-                : this.screen === 'input'
-                  ? this.returnToSubmit()
-                  : this.openScoreAbortQuestion()));
+                (this.scoreFlowModal
+                  ? this.closeScoreFlowModal()
+                  : this.screen === 'input'
+                    ? this.returnToSubmit()
+                    : this.openScoreAbortQuestion()));
             return;
           }
           if (this.screen === 'select') {
             if ((this.keys.add(e), this.selectModal)) {
               e === 'KeyQ' &&
                 ((this.selectModal = void 0),
-                  this.clearAllSourceInputs(),
-                  this.renderSourceSelectScreen());
+                this.clearAllSourceInputs(),
+                this.renderSourceSelectScreen());
               return;
             }
             e === 'KeyQ'
@@ -966,8 +970,8 @@ class RageOfMagicGame {
               ['demo', 'show', 'preview'].includes(this.sourceMode) &&
               this.isSourceControllerCode(e) &&
               (this.playAbortRequested = !0),
-              this.keys.add(e),
-              this.screen === 'menu')
+            this.keys.add(e),
+            this.screen === 'menu')
           ) {
             e === 'KeyQ' ? this.handleMenuKey(e) : e === 'F1' && this.toggleSourceHints();
             return;
@@ -1229,10 +1233,10 @@ class RageOfMagicGame {
     const e = this.renderer;
     if (!e) return;
     const t = RenderTexture.create({
-      width: SCREEN_WIDTH,
-      height: SCREEN_HEIGHT,
-      resolution: 1,
-    }),
+        width: SCREEN_WIDTH,
+        height: SCREEN_HEIGHT,
+        resolution: 1,
+      }),
       i = this.overlayLayer.visible;
     try {
       ((this.overlayLayer.visible = !1),
@@ -1262,7 +1266,7 @@ class RageOfMagicGame {
   clearPausePresentation() {
     (this.clearHelpPresentation(!1),
       this.menuKeyCaptureLayer?.parent &&
-      this.menuKeyCaptureLayer.parent.removeChild(this.menuKeyCaptureLayer),
+        this.menuKeyCaptureLayer.parent.removeChild(this.menuKeyCaptureLayer),
       this.menuKeyCaptureLayer?.destroy({
         children: !0,
       }),
@@ -1314,8 +1318,8 @@ class RageOfMagicGame {
       (this.renderPause(),
         this.renderMenuKeyCapture(),
         this.menuKeyCapture &&
-        this.menuKeyCapture.errorFrames > 0 &&
-        (this.menuKeyCapture.errorFrames -= 1));
+          this.menuKeyCapture.errorFrames > 0 &&
+          (this.menuKeyCapture.errorFrames -= 1));
       return;
     }
     if (this.pauseModal) {
@@ -1325,12 +1329,12 @@ class RageOfMagicGame {
     const e = this.pauseMove;
     (e &&
       ((this.pauseCameraX = Math.trunc(easeIn(e.startX, e.targetX, e.step, e.steps))),
-        (this.pauseCameraY = Math.trunc(easeIn(e.startY, e.targetY, e.step, e.steps))),
-        e.step <= e.steps
-          ? (e.step += 1)
-          : ((this.pauseCameraX = Math.trunc(e.targetX)),
-            (this.pauseCameraY = Math.trunc(e.targetY)),
-            (this.pauseMove = void 0))),
+      (this.pauseCameraY = Math.trunc(easeIn(e.startY, e.targetY, e.step, e.steps))),
+      e.step <= e.steps
+        ? (e.step += 1)
+        : ((this.pauseCameraX = Math.trunc(e.targetX)),
+          (this.pauseCameraY = Math.trunc(e.targetY)),
+          (this.pauseMove = void 0))),
       (this.pauseSwordDraws += 1),
       this.renderPause());
   }
@@ -1396,8 +1400,8 @@ class RageOfMagicGame {
       GAME_KEYS.has(e) &&
         n.action &&
         (this.playSound(OPTIONS_SCREEN.acceptAudio),
-          this.clearAllSourceInputs(),
-          this.applyPauseAction(n.action));
+        this.clearAllSourceInputs(),
+        this.applyPauseAction(n.action));
     }
   }
   pauseMenuPathTitles() {
@@ -1535,10 +1539,10 @@ class RageOfMagicGame {
         : e === 'toggle-fullscreen' && typeof document < 'u'
           ? document.fullscreenElement
             ? document.exitFullscreen()
-            : document.documentElement.requestFullscreen().catch(() => { })
+            : document.documentElement.requestFullscreen().catch(() => {})
           : e !== 'restore-keyboard' &&
-          e !== 'restore-button-mapping' &&
-          this.applySourceConfigurationAction(e),
+            e !== 'restore-button-mapping' &&
+            this.applySourceConfigurationAction(e),
       (this.pauseMenu = this.buildPauseMenu()));
     const r = this.currentPauseMenu();
     (r && (this.pauseIndex = Math.min(this.pauseIndex, Math.max(0, r.items.length - 1))),
@@ -1574,12 +1578,12 @@ class RageOfMagicGame {
       this.renderPause(),
       this.clearHelpPresentation(!1),
       this.renderer &&
-      this.pauseComposite &&
-      ((this.helpFrozenTexture = RenderTexture.create({
-        width: SCREEN_WIDTH,
-        height: SCREEN_HEIGHT,
-        resolution: 1,
-      })),
+        this.pauseComposite &&
+        ((this.helpFrozenTexture = RenderTexture.create({
+          width: SCREEN_WIDTH,
+          height: SCREEN_HEIGHT,
+          resolution: 1,
+        })),
         this.renderer.render({
           container: this.pauseComposite,
           target: this.helpFrozenTexture,
@@ -1594,10 +1598,10 @@ class RageOfMagicGame {
   closeControlsHelp() {
     this.screen === 'help' &&
       (this.clearHelpPresentation(!0),
-        (this.screen = 'paused'),
-        this.clearAllSourceInputs(),
-        this.playSound('gling'),
-        this.renderPause());
+      (this.screen = 'paused'),
+      this.clearAllSourceInputs(),
+      this.playSound('gling'),
+      this.renderPause());
   }
   handleControlsHelpReleasedKey(e, t) {
     if (this.screen !== 'help') return;
@@ -1612,7 +1616,7 @@ class RageOfMagicGame {
           this.playSound('click'),
           this.renderControlsHelp())
         : r > 0 &&
-        ((this.controlsHelpPlayer = nextPauseChoice(this.controlsHelpPlayer, 1)),
+          ((this.controlsHelpPlayer = nextPauseChoice(this.controlsHelpPlayer, 1)),
           this.playSound('click'),
           this.renderControlsHelp());
   }
@@ -1620,10 +1624,10 @@ class RageOfMagicGame {
     const e = !this.audio.muted;
     (this.audio.setMuted(e),
       !e &&
-      this.musicPlaybackRequested &&
-      !this.musicMuted &&
-      this.currentMusic &&
-      this.audio.playLoop(this.currentMusic),
+        this.musicPlaybackRequested &&
+        !this.musicMuted &&
+        this.currentMusic &&
+        this.audio.playLoop(this.currentMusic),
       this.emitState(!0));
   }
   toggleMusicChannel() {
@@ -1643,34 +1647,34 @@ class RageOfMagicGame {
       !this.startupStarted ||
       this.destroyed ||
       ((this.sceneGeneration += 1),
-        (this.sceneTransition = void 0),
-        (this.uiScreenFade = void 0),
-        (this.startupLoad = void 0),
-        (this.startupFade = void 0),
-        (this.startupFadeFilter = void 0),
-        (this.playSplashFade = void 0),
-        (this.playExitFade = void 0),
-        (this.endRouteFade = void 0),
-        (this.playQuestion = void 0),
-        (this.interstitial = void 0),
-        (this.suspendedScript = void 0),
-        (this.pendingScripts.length = 0),
-        (this.pendingSubmit = void 0),
-        (this.selectRawInput = void 0),
-        (this.selectModal = void 0),
-        (this.superMusicSnapshot = void 0),
-        (this.playAbortRequested = !1),
-        (this.playEscapeRequested = !1),
-        (this.playHelpRequested = !1),
-        this.clearSceneTransitionHue(),
-        (this.screenLayer.filters = []),
-        (this.overlayLayer.filters = []),
-        this.audio.stopAll(),
-        (this.logoVoice = void 0),
-        (this.introVoice = void 0),
-        this.clearPauseMenu(),
-        this.clearVersusEndFlow(),
-        this.openMenu());
+      (this.sceneTransition = void 0),
+      (this.uiScreenFade = void 0),
+      (this.startupLoad = void 0),
+      (this.startupFade = void 0),
+      (this.startupFadeFilter = void 0),
+      (this.playSplashFade = void 0),
+      (this.playExitFade = void 0),
+      (this.endRouteFade = void 0),
+      (this.playQuestion = void 0),
+      (this.interstitial = void 0),
+      (this.suspendedScript = void 0),
+      (this.pendingScripts.length = 0),
+      (this.pendingSubmit = void 0),
+      (this.selectRawInput = void 0),
+      (this.selectModal = void 0),
+      (this.superMusicSnapshot = void 0),
+      (this.playAbortRequested = !1),
+      (this.playEscapeRequested = !1),
+      (this.playHelpRequested = !1),
+      this.clearSceneTransitionHue(),
+      (this.screenLayer.filters = []),
+      (this.overlayLayer.filters = []),
+      this.audio.stopAll(),
+      (this.logoVoice = void 0),
+      (this.introVoice = void 0),
+      this.clearPauseMenu(),
+      this.clearVersusEndFlow(),
+      this.openMenu());
   }
   destroy() {
     ((this.destroyed = !0),
@@ -1679,7 +1683,7 @@ class RageOfMagicGame {
       this.audio.destroy(),
       this.clearPausePresentation(),
       this.shadowSceneFilter &&
-      ((this.shadowLayer.filters = []),
+        ((this.shadowLayer.filters = []),
         this.shadowSceneFilter.destroy(),
         (this.shadowSceneFilter = void 0)),
       this.root.destroy({
@@ -1763,14 +1767,14 @@ class RageOfMagicGame {
         i.action === 'draw'
           ? this.renderStaticScreen()
           : i.action === 'begin-fade' &&
-          ((e.phase = 'fade'),
+            ((e.phase = 'fade'),
             (e.fadeStep = 0),
             (e.filter =
               typeof document > 'u'
                 ? void 0
                 : new ColorMatrixFilter({
-                  padding: 0,
-                }))));
+                    padding: 0,
+                  }))));
       return;
     }
     if (!fadeDone(e.fadeStep, SPLASH_RATE)) {
@@ -1835,16 +1839,16 @@ class RageOfMagicGame {
   beginStartupFade(e, t = SPLASH_RATE) {
     this.startupFade ||
       (this.clearAllSourceInputs(),
-        this.splashHeldActions.clear(),
-        (this.startupFade = {
-          step: 0,
-          steps: t,
-          next: e,
-        }),
-        (this.startupFadeFilter =
-          typeof document > 'u'
-            ? void 0
-            : new ColorMatrixFilter({
+      this.splashHeldActions.clear(),
+      (this.startupFade = {
+        step: 0,
+        steps: t,
+        next: e,
+      }),
+      (this.startupFadeFilter =
+        typeof document > 'u'
+          ? void 0
+          : new ColorMatrixFilter({
               padding: 0,
             })));
   }
@@ -1914,11 +1918,11 @@ class RageOfMagicGame {
   stepSplash() {
     if (
       (this.applySplashHue(introSubtitleHue(this.screenFrame)),
-        this.updateSplashPromptVisibility(),
-        !this.splashMusicCleared &&
+      this.updateSplashPromptVisibility(),
+      !this.splashMusicCleared &&
         introSubtitleDone(this.screenFrame) &&
         (this.selectCurrentMusic(void 0, !1), (this.splashMusicCleared = !0)),
-        attractFinished(this.screenFrame + 1))
+      attractFinished(this.screenFrame + 1))
     ) {
       this.splashAdvanceRequested = !1;
       const e = attractAction(this.introLoop, this.progress.arcadeWon);
@@ -1931,8 +1935,8 @@ class RageOfMagicGame {
     } else
       this.splashAdvanceRequested &&
         ((this.splashAdvanceRequested = !1),
-          this.playSound('gling'),
-          this.beginStartupFade('menu'));
+        this.playSound('gling'),
+        this.beginStartupFade('menu'));
   }
   launchAttractAction() {
     const e = this.pendingAttractAction;
@@ -1989,8 +1993,8 @@ class RageOfMagicGame {
     if (this.menuKeyCapture?.origin === 'menu') {
       (this.renderMenuKeyCapture(),
         this.menuKeyCapture &&
-        this.menuKeyCapture.errorFrames > 0 &&
-        (this.menuKeyCapture.errorFrames -= 1));
+          this.menuKeyCapture.errorFrames > 0 &&
+          (this.menuKeyCapture.errorFrames -= 1));
       return;
     }
     if (this.menuSecretInput) {
@@ -2020,13 +2024,13 @@ class RageOfMagicGame {
         Math.trunc(easeIn(e.startX, e.targetX, e.step, e.steps)),
         Math.trunc(easeIn(e.startY, e.targetY, e.step, e.steps)),
       ),
-        e.step <= e.steps
-          ? (e.step += 1)
-          : (this.menuPanel.position.set(Math.trunc(e.targetX), Math.trunc(e.targetY)),
-            (this.menuMove = void 0))),
+      e.step <= e.steps
+        ? (e.step += 1)
+        : (this.menuPanel.position.set(Math.trunc(e.targetX), Math.trunc(e.targetY)),
+          (this.menuMove = void 0))),
       this.menuFadeOverlay && (this.menuFadeOverlay.alpha = Math.max(0, 1 - this.screenFrame / 10)),
       this.menuSword &&
-      (this.menuSword.x = this.menuSwordBaseX + (Math.floor(this.screenFrame / 10) & 1)),
+        (this.menuSword.x = this.menuSwordBaseX + (Math.floor(this.screenFrame / 10) & 1)),
       (this.menuIdleFrames += 1));
     const t = this.pendingMenuReleasedCode;
     ((this.pendingMenuReleasedCode = void 0), t && this.handleMenuKey(t));
@@ -2068,17 +2072,17 @@ class RageOfMagicGame {
     ((this.menuKeyCapture = void 0),
       this.clearAllSourceInputs(),
       this.menuKeyCaptureLayer?.parent &&
-      this.menuKeyCaptureLayer.parent.removeChild(this.menuKeyCaptureLayer),
+        this.menuKeyCaptureLayer.parent.removeChild(this.menuKeyCaptureLayer),
       this.menuKeyCaptureLayer?.destroy({
         children: !0,
       }),
       (this.menuKeyCaptureLayer = void 0),
       e !== 'paused' &&
-      this.overlayLayer.removeChildren().forEach((t) =>
-        t.destroy({
-          children: !0,
-        }),
-      ),
+        this.overlayLayer.removeChildren().forEach((t) =>
+          t.destroy({
+            children: !0,
+          }),
+        ),
       e === 'paused'
         ? ((this.pauseMenu = this.buildPauseMenu()), this.renderPause())
         : this.rebuildSourceMenu());
@@ -2093,11 +2097,11 @@ class RageOfMagicGame {
       }),
       (this.menuKeyCaptureLayer = void 0),
       e.origin !== 'paused' &&
-      this.overlayLayer.removeChildren().forEach((l) =>
-        l.destroy({
-          children: !0,
-        }),
-      ));
+        this.overlayLayer.removeChildren().forEach((l) =>
+          l.destroy({
+            children: !0,
+          }),
+        ));
     const t = new Container();
     t.addChild(
       new Graphics().rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT).fill({
@@ -2152,28 +2156,28 @@ class RageOfMagicGame {
     if (t.help) {
       GAME_KEYS.has(e) &&
         ((t.help = !1),
-          this.playSound('gling'),
-          this.clearAllSourceInputs(),
-          this.renderMenuSecretInput());
+        this.playSound('gling'),
+        this.clearAllSourceInputs(),
+        this.renderMenuSecretInput());
       return;
     }
     const i =
       e === 'ArrowRight' || e === 'Numpad6'
         ? {
-          x: 1,
-        }
+            x: 1,
+          }
         : e === 'ArrowLeft' || e === 'Numpad4'
           ? {
-            x: -1,
-          }
+              x: -1,
+            }
           : e === 'ArrowDown' || e === 'Numpad5'
             ? {
-              y: 1,
-            }
+                y: 1,
+              }
             : e === 'ArrowUp' || e === 'Numpad8'
               ? {
-                y: -1,
-              }
+                  y: -1,
+                }
               : void 0;
     if (i) {
       ((t.state = moveNameCursor(t.state, i)),
@@ -2194,8 +2198,8 @@ class RageOfMagicGame {
     const t = parseCheatCode(e, this.secretAdmin);
     if (
       ((this.menuSecretInput = void 0),
-        t.kind !== 'invalid' && (this.rankedScoreEligible = !1),
-        t.kind === 'submit')
+      t.kind !== 'invalid' && (this.rankedScoreEligible = !1),
+      t.kind === 'submit')
     ) {
       (this.clearAllSourceInputs(), this.openSubmit(t.mode === 0 ? 'arcade' : 'arena', t.score));
       return;
@@ -2367,13 +2371,13 @@ class RageOfMagicGame {
         (f(0, 'secret-key-normal'),
           d && f(n.selectedKeyOn ? 1 : 2, `secret-key-selected-${n.selectedKeyOn ? 1 : 2}`));
         const m =
-          c === '\b'
-            ? ''
-            : c ===
-              `
+            c === '\b'
+              ? ''
+              : c ===
+                  `
 `
-              ? ''
-              : c,
+                ? ''
+                : c,
           p = d ? 3 : 4,
           g = this.sourceBitmapWidth(p, m);
         this.addSourceBitmap(t, p, m, h + Math.trunc((32 - g) / 2) - 1, u + 4);
@@ -2420,7 +2424,7 @@ class RageOfMagicGame {
       (this.selectModal.kind === 'popup' &&
         this.selectModal.frames > 0 &&
         ((this.selectModal.frames -= 1),
-          this.selectModal.frames === 0 &&
+        this.selectModal.frames === 0 &&
           ((this.selectModal = void 0), this.clearAllSourceInputs())),
         this.renderSourceSelectScreen());
       return;
@@ -2432,8 +2436,8 @@ class RageOfMagicGame {
           this.selectState,
           e
             ? {
-              key: e,
-            }
+                key: e,
+              }
             : {},
         ),
       ));
@@ -2446,7 +2450,7 @@ class RageOfMagicGame {
       else if (GAME_KEYS.has(e)) {
         if (
           (this.playSound('gling'),
-            this.selectModal.kind === 'question' && this.selectModal.choice === 0)
+          this.selectModal.kind === 'question' && this.selectModal.choice === 0)
         ) {
           ((this.selectModal = void 0),
             (this.introLoop = 0),
@@ -2463,84 +2467,84 @@ class RageOfMagicGame {
     const t =
       e === 'ArrowLeft'
         ? {
-          controller: 0,
-          x: -1,
-        }
+            controller: 0,
+            x: -1,
+          }
         : e === 'ArrowRight'
           ? {
-            controller: 0,
-            x: 1,
-          }
+              controller: 0,
+              x: 1,
+            }
           : e === 'ArrowUp'
             ? {
-              controller: 0,
-              y: -1,
-            }
+                controller: 0,
+                y: -1,
+              }
             : e === 'ArrowDown'
               ? {
-                controller: 0,
-                y: 1,
-              }
+                  controller: 0,
+                  y: 1,
+                }
               : e === 'KeyA' || e === 'Enter' || e === 'Space'
                 ? {
-                  controller: 0,
-                  button: 0,
-                }
+                    controller: 0,
+                    button: 0,
+                  }
                 : e === 'KeyS'
                   ? {
-                    controller: 0,
-                    button: 1,
-                  }
+                      controller: 0,
+                      button: 1,
+                    }
                   : e === 'KeyD'
                     ? {
-                      controller: 0,
-                      button: 2,
-                    }
+                        controller: 0,
+                        button: 2,
+                      }
                     : e === 'KeyW'
                       ? {
-                        controller: 0,
-                        button: 3,
-                      }
+                          controller: 0,
+                          button: 3,
+                        }
                       : e === 'Numpad4'
                         ? {
-                          controller: 1,
-                          x: -1,
-                        }
+                            controller: 1,
+                            x: -1,
+                          }
                         : e === 'Numpad6'
                           ? {
-                            controller: 1,
-                            x: 1,
-                          }
+                              controller: 1,
+                              x: 1,
+                            }
                           : e === 'Numpad8'
                             ? {
-                              controller: 1,
-                              y: -1,
-                            }
+                                controller: 1,
+                                y: -1,
+                              }
                             : e === 'Numpad5'
                               ? {
-                                controller: 1,
-                                y: 1,
-                              }
+                                  controller: 1,
+                                  y: 1,
+                                }
                               : e === 'Numpad7'
                                 ? {
-                                  controller: 1,
-                                  button: 0,
-                                }
+                                    controller: 1,
+                                    button: 0,
+                                  }
                                 : e === 'Numpad9'
                                   ? {
-                                    controller: 1,
-                                    button: 1,
-                                  }
+                                      controller: 1,
+                                      button: 1,
+                                    }
                                   : e === 'NumpadAdd'
                                     ? {
-                                      controller: 1,
-                                      button: 2,
-                                    }
+                                        controller: 1,
+                                        button: 2,
+                                      }
                                     : e === 'Numpad0'
                                       ? {
-                                        controller: 1,
-                                        button: 3,
-                                      }
+                                          controller: 1,
+                                          button: 3,
+                                        }
                                       : void 0;
     t &&
       this.applySourceSelectStep(
@@ -2554,9 +2558,9 @@ class RageOfMagicGame {
       (this.pauseHints = e.state.hints),
       this.applySourceSelectEffects(e.effects),
       this.screen === 'select' &&
-      !this.uiScreenFade &&
-      !this.sceneTransition &&
-      this.renderSourceSelectScreen());
+        !this.uiScreenFade &&
+        !this.sceneTransition &&
+        this.renderSourceSelectScreen());
   }
   applySourceSelectEffects(e) {
     for (const t of e)
@@ -2574,21 +2578,21 @@ class RageOfMagicGame {
                   ? (this.clearAllSourceInputs(),
                     t.screen.kind === 'question'
                       ? (this.selectModal = {
-                        kind: 'question',
-                        title: t.screen.title,
-                        message: t.screen.question,
-                        choice: 1,
-                        frames: 0,
-                      })
+                          kind: 'question',
+                          title: t.screen.title,
+                          message: t.screen.question,
+                          choice: 1,
+                          frames: 0,
+                        })
                       : (this.selectModal = {
-                        kind: 'popup',
-                        title: t.screen.title,
-                        message: 'message' in t.screen ? t.screen.message : t.screen.body,
-                        choice: 0,
-                        frames: 'duration' in t.screen ? t.screen.duration : 0,
-                      }))
+                          kind: 'popup',
+                          title: t.screen.title,
+                          message: 'message' in t.screen ? t.screen.message : t.screen.body,
+                          choice: 0,
+                          frames: 'duration' in t.screen ? t.screen.duration : 0,
+                        }))
                   : (t.type === 'screen-fade' || t.type === 'screen-fade-load') &&
-                  this.finishSourceSelect(t.type === 'screen-fade-load' ? 'load' : 'fade');
+                    this.finishSourceSelect(t.type === 'screen-fade-load' ? 'load' : 'fade');
   }
   finishSourceSelect(e) {
     const t = this.selectState;
@@ -2609,12 +2613,12 @@ class RageOfMagicGame {
             : void 0;
       a &&
         ((a.didJoin = r.didJoin),
-          (a.character = r.character),
-          (a.color = r.color),
-          (a.score = r.score),
-          (a.coins = r.coins),
-          (a.allyCount = i),
-          (a.selectList = [...r.selectList]));
+        (a.character = r.character),
+        (a.color = r.color),
+        (a.score = r.score),
+        (a.coins = r.coins),
+        (a.allyCount = i),
+        (a.selectList = [...r.selectList]));
     }
     const n = this.selectedPlayers[1];
     (this.sourceMode === 'arena' &&
@@ -2664,18 +2668,18 @@ class RageOfMagicGame {
     (e &&
       this.scorePanel &&
       ((e.frame += 1),
-        (this.scorePanel.x = highScorePageSlide(e.from, e.to, e.frame)),
-        e.frame > HIGH_SCORE_SCREEN.moveSteps &&
+      (this.scorePanel.x = highScorePageSlide(e.from, e.to, e.frame)),
+      e.frame > HIGH_SCORE_SCREEN.moveSteps &&
         ((this.scoreMode = e.to),
-          (this.scorePanel.x = this.scoreMode === 'arcade' ? 0 : -SCREEN_WIDTH),
-          (this.scoreTransition = void 0))),
+        (this.scorePanel.x = this.scoreMode === 'arcade' ? 0 : -SCREEN_WIDTH),
+        (this.scoreTransition = void 0))),
       this.scorePanel &&
-      this.scoreFilter &&
-      this.setDisplayAdditiveHue(
-        this.scorePanel,
-        this.scoreFilter,
-        highScoreHue(this.screenFrame),
-      ));
+        this.scoreFilter &&
+        this.setDisplayAdditiveHue(
+          this.scorePanel,
+          this.scoreFilter,
+          highScoreHue(this.screenFrame),
+        ));
   }
   handleScoresReleasedKey(e) {
     if (this.scoreModal) {
@@ -2698,8 +2702,8 @@ class RageOfMagicGame {
       const r = stepQuestion(this.scoreModal.state, i);
       if (
         ((this.scoreModal.state = r.state),
-          'sound' in r && r.sound && this.playSound(r.sound),
-          r.kind === 'choose')
+        'sound' in r && r.sound && this.playSound(r.sound),
+        r.kind === 'choose')
       ) {
         if (r.choice === 0) {
           const n = resetHighScores(this.localScores, this.scoreMode);
@@ -2724,7 +2728,7 @@ class RageOfMagicGame {
           to: i,
           frame: 0,
         }),
-          this.playSound('movestone'));
+        this.playSound('movestone'));
       return;
     }
     e === 'KeyW' || e === 'Numpad0'
@@ -2757,7 +2761,7 @@ class RageOfMagicGame {
           children: !0,
         }),
       ),
-        !e)
+      !e)
     )
       return;
     const t = new Container();
@@ -2768,7 +2772,7 @@ class RageOfMagicGame {
           alpha: 1 - QUESTION_DIM,
         }),
       ),
-        e.kind === 'question')
+      e.kind === 'question')
     ) {
       const n = this.sourceCroppedTexture('ui.guiform', QUESTION_LAYOUT.form);
       if (n) {
@@ -2837,7 +2841,7 @@ class RageOfMagicGame {
       (this.scoreFlowModal.kind === 'popup' &&
         this.scoreFlowModal.frames > 0 &&
         ((this.scoreFlowModal.frames -= 1),
-          this.scoreFlowModal.frames === 0 && this.closeScoreFlowModal()),
+        this.scoreFlowModal.frames === 0 && this.closeScoreFlowModal()),
         this.renderScoreFlow());
       return;
     }
@@ -2867,7 +2871,7 @@ class RageOfMagicGame {
     else if (e === 'toggle-slow')
       ((this.slowEnabled = !this.slowEnabled),
         this.slowEnabled ||
-        ((this.slowAmount = 0),
+          ((this.slowAmount = 0),
           (this.slowDecay = 0),
           (this.sourceUpdateRate = this.sourceGameRate())));
     else if (e === 'toggle-ministats') this.miniStats = !this.miniStats;
@@ -2888,7 +2892,7 @@ class RageOfMagicGame {
               (this.foregroundLayer.visible = !0)),
         (this.settings.scaleToFit = this.graphicsIndex === 2),
         this.slowEnabled ||
-        ((this.slowAmount = 0),
+          ((this.slowAmount = 0),
           (this.slowDecay = 0),
           (this.sourceUpdateRate = this.sourceGameRate())));
     else if (e === 'restore-game-settings')
@@ -2949,7 +2953,7 @@ class RageOfMagicGame {
         ? ((this.submitChoice = nextSubmitOption(this.submitChoice, n, !0)),
           this.playSound(SUBMIT_SCREEN.moveAudio))
         : t &&
-        (this.playSound(SUBMIT_SCREEN.acceptAudio),
+          (this.playSound(SUBMIT_SCREEN.acceptAudio),
           this.openSubmitRoute(
             submitPrompt(
               this.submitChoice,
@@ -2965,20 +2969,20 @@ class RageOfMagicGame {
     const r =
       e === 'ArrowRight' || e === 'Numpad6'
         ? {
-          x: 1,
-        }
+            x: 1,
+          }
         : e === 'ArrowLeft' || e === 'Numpad4'
           ? {
-            x: -1,
-          }
+              x: -1,
+            }
           : e === 'ArrowDown' || e === 'Numpad5'
             ? {
-              y: 1,
-            }
+                y: 1,
+              }
             : e === 'ArrowUp' || e === 'Numpad8'
               ? {
-                y: -1,
-              }
+                  y: -1,
+                }
               : void 0;
     if (r) ((this.hiscoreInput = moveHighScoreCursor(i, r)), this.playSound('click'));
     else if (t) {
@@ -3032,13 +3036,13 @@ class RageOfMagicGame {
     const e = submitPrompt(2, null, this.edition === 'full');
     e.kind === 'question' &&
       (this.clearAllSourceInputs(),
-        (this.scoreFlowModal = {
-          kind: 'question',
-          route: e,
-          choice: e.defaultChoice,
-          frames: 0,
-        }),
-        this.renderScoreFlow());
+      (this.scoreFlowModal = {
+        kind: 'question',
+        route: e,
+        choice: e.defaultChoice,
+        frames: 0,
+      }),
+      this.renderScoreFlow());
   }
   returnToSubmit() {
     ((this.screen = 'submit'),
@@ -3051,8 +3055,8 @@ class RageOfMagicGame {
     const e = this.scoreFlowModal?.route;
     if (
       ((this.scoreFlowModal = void 0),
-        this.clearAllSourceInputs(),
-        e?.kind === 'popup' && e.afterClose)
+      this.clearAllSourceInputs(),
+      e?.kind === 'popup' && e.afterClose)
     ) {
       ((this.hiscoreInput = void 0),
         this.openScores(e.afterClose.mode, e.afterClose.highlightName));
@@ -3100,8 +3104,8 @@ class RageOfMagicGame {
           this.clearAllSourceInputs(),
           this.renderMenuSelection())
         : r &&
-        n.action &&
-        ((this.menuIdleFrames = 0),
+          n.action &&
+          ((this.menuIdleFrames = 0),
           this.playSound('gling'),
           this.clearAllSourceInputs(),
           this.chooseMenu(n.action)));
@@ -3184,8 +3188,8 @@ class RageOfMagicGame {
     const i = stepQuestion(t.state, e);
     if (
       ((t.state = i.state),
-        'sound' in i && i.sound && this.playSound(i.sound),
-        i.kind === 'dismiss')
+      'sound' in i && i.sound && this.playSound(i.sound),
+      i.kind === 'dismiss')
     ) {
       this.closeMenuQuestion();
       return;
@@ -3196,9 +3200,9 @@ class RageOfMagicGame {
       if ((this.closeMenuQuestion(), !n)) return;
       r === 'exit'
         ? this.renderTextPage('EXIT GAME', [
-          'The browser owns this window.',
-          'Press Enter to return to the main menu.',
-        ])
+            'The browser owns this window.',
+            'Press Enter to return to the main menu.',
+          ])
         : this.chooseMenu(r, !0);
       return;
     }
@@ -3215,15 +3219,15 @@ class RageOfMagicGame {
   }
   chooseMenu(e, t = !1) {
     const i = (o, l = !1) => ({
-      dataName: 'arcade',
-      background: 'sc-cliff-1a',
-      mode: 'arcade',
-      replay: o,
-      maxUnlocked: this.progress.arcadeWon
-        ? 99999
-        : Math.max(1, this.progress.arcadeMaxChapter - (o ? 1 : 0)),
-      heroAfterSelection: l,
-    }),
+        dataName: 'arcade',
+        background: 'sc-cliff-1a',
+        mode: 'arcade',
+        replay: o,
+        maxUnlocked: this.progress.arcadeWon
+          ? 99999
+          : Math.max(1, this.progress.arcadeMaxChapter - (o ? 1 : 0)),
+        heroAfterSelection: l,
+      }),
       r = (o, l = !1) => ({
         dataName: 'arena',
         background: 'sc-arena-1a',
@@ -3278,7 +3282,7 @@ class RageOfMagicGame {
     if (e === 'begin-arcade' || e === 'restart-arcade')
       (this.resetSourcePlayer('arcade'),
         e === 'restart-arcade' &&
-        ((this.progress.arcadeChapter = 1),
+          ((this.progress.arcadeChapter = 1),
           (this.progress.arcadeMaxChapter = 1),
           (this.progress.arcadeWon = !1),
           this.saveProgress()),
@@ -3290,15 +3294,15 @@ class RageOfMagicGame {
         this.progress.arcadeWon
           ? this.beginMenuScreenFade(() => this.openNovel('arcade-win', 'menu', !0))
           : this.beginMenuScreenFade(() =>
-            this.startChapterSession(i(!1), Math.max(0, this.progress.arcadeChapter - 1)),
-          ));
+              this.startChapterSession(i(!1), Math.max(0, this.progress.arcadeChapter - 1)),
+            ));
     else if (e === 'replay-arcade')
       (this.resetNewMode('arcade'),
         this.beginMenuScreenFade(() => this.startChapterSession(i(!0), 0)));
     else if (e === 'begin-arena' || e === 'restart-arena')
       (this.resetSourcePlayer('arena'),
         e === 'restart-arena' &&
-        ((this.progress.arenaChapter = 1),
+          ((this.progress.arenaChapter = 1),
           (this.progress.arenaMaxChapter = 1),
           (this.progress.arenaWon = !1),
           this.saveProgress()),
@@ -3315,12 +3319,12 @@ class RageOfMagicGame {
         this.progress.arenaWon
           ? this.beginMenuScreenFade(() => this.openNovel('arena-win', 'menu', !0))
           : this.beginMenuScreenFade(() =>
-            this.startHeroSelection('arena', {
-              kind: 'chapters',
-              session: r(!1),
-              index: Math.max(0, this.progress.arenaChapter - 1),
-            }),
-          ));
+              this.startHeroSelection('arena', {
+                kind: 'chapters',
+                session: r(!1),
+                index: Math.max(0, this.progress.arenaChapter - 1),
+              }),
+            ));
     else if (e === 'replay-arena')
       (this.resetNewMode('arena'),
         this.beginMenuScreenFade(() => this.startChapterSession(r(!0, !0), -1)));
@@ -3437,7 +3441,7 @@ class RageOfMagicGame {
     else if (e === 'toggle-fullscreen')
       (document.fullscreenElement
         ? document.exitFullscreen()
-        : document.documentElement.requestFullscreen().catch(() => { }),
+        : document.documentElement.requestFullscreen().catch(() => {}),
         this.rebuildSourceMenu());
     else if (e === 'restore-keyboard') {
       for (const o of [0, 1])
@@ -3451,13 +3455,13 @@ class RageOfMagicGame {
       this.applySourceConfigurationAction(e)
         ? this.rebuildSourceMenu()
         : (e === 'official-website' ||
-          e === 'fan-store' ||
-          e === 'game-update' ||
-          e === 'more-games') &&
-        this.renderTextPage('VISIT ONLINE', [
-          'The original external link is intentionally not opened automatically.',
-          'All restored game media stays local.',
-        ]);
+            e === 'fan-store' ||
+            e === 'game-update' ||
+            e === 'more-games') &&
+          this.renderTextPage('VISIT ONLINE', [
+            'The original external link is intentionally not opened automatically.',
+            'All restored game media stays local.',
+          ]);
   }
   resetNewMode(e, t = e) {
     ((this.score =
@@ -3492,7 +3496,7 @@ class RageOfMagicGame {
    */
   preloadSurvivalAvatars() {
     for (const e of SURVIVAL_CHARACTERS)
-      e.hero === void 0 && e.icon === void 0 && this.ensureAtlas(e.id).catch(() => { });
+      e.hero === void 0 && e.icon === void 0 && this.ensureAtlas(e.id).catch(() => {});
   }
   startHeroSelection(e, t) {
     (this.clearAllSourceInputs(),
@@ -3500,9 +3504,9 @@ class RageOfMagicGame {
       (this.sourceMode = e),
       (this.heroDestination = t));
     const i =
-      e === 'arena' || e === 'practice' || e === 'survival' || e === 'tutorial' || e === 'versus'
-        ? e
-        : 'arcade',
+        e === 'arena' || e === 'practice' || e === 'survival' || e === 'tutorial' || e === 'versus'
+          ? e
+          : 'arcade',
       r = i === 'arena' ? this.progress.arenaPlayer : this.progress.arcadePlayer,
       n = i === 'arena' ? normalizePlayerProgress(this.progress.arenaPlayer2, 1) : void 0,
       a = e === 'versus' && this.selectedPlayers.length >= 2 ? this.selectedPlayers : void 0,
@@ -3521,33 +3525,33 @@ class RageOfMagicGame {
         players: [
           a?.[0]
             ? newSelectPlayer(0, {
-              ...a[0],
-              didJoin: !0,
-              selectList: a[0].selectList,
-            })
+                ...a[0],
+                didJoin: !0,
+                selectList: a[0].selectList,
+              })
             : newSelectPlayer(0, {
-              didJoin: !0,
-              character: r.character,
-              color: r.color,
-              score: r.score,
-              coins: r.coins,
-              controller: 0,
-              selectList: r.selectList,
-            }),
+                didJoin: !0,
+                character: r.character,
+                color: r.color,
+                score: r.score,
+                coins: r.coins,
+                controller: 0,
+                selectList: r.selectList,
+              }),
           a?.[1]
             ? newSelectPlayer(1, {
-              ...a[1],
-              selectList: a[1].selectList,
-            })
+                ...a[1],
+                selectList: a[1].selectList,
+              })
             : newSelectPlayer(1, {
-              didJoin: n?.didJoin ?? !1,
-              character: n?.character ?? 1,
-              color: n?.color ?? 0,
-              score: n?.score ?? 0,
-              coins: n?.coins ?? 0,
-              controller: 1,
-              selectList: n?.selectList ?? newPlayerProgress(1).selectList,
-            }),
+                didJoin: n?.didJoin ?? !1,
+                character: n?.character ?? 1,
+                color: n?.color ?? 0,
+                score: n?.score ?? 0,
+                coins: n?.coins ?? 0,
+                controller: 1,
+                selectList: n?.selectList ?? newPlayerProgress(1).selectList,
+              }),
         ],
         nextScreen: {
           kind: 'hero-destination',
@@ -3556,7 +3560,7 @@ class RageOfMagicGame {
         loadTitle: o ? this.replaceTextVars(o.section.title ?? '') : null,
         loadSubtitle: o?.section.subtitle ?? null,
         hints: this.pauseHints,
-        controllerCount: 2,
+        controllerCount: e === 'survival' ? 1 : 2,
         carriedMaxAllies: r.allyCount,
       });
     ((this.selectState = l.state),
@@ -3596,21 +3600,21 @@ class RageOfMagicGame {
       t = this.manifest.data[e?.dataName ?? this.dataName];
     return e?.category === 'Posters'
       ? parseNovelPages(t.Posters).map((i) => ({
-        ...i,
-        script: i.number,
-      }))
+          ...i,
+          script: i.number,
+        }))
       : e?.category === 'Versus'
         ? Object.entries(t.Versus ?? {})
-          .filter(([i]) => /^\d+$/.test(i))
-          .sort(([i], [r]) => Number(i) - Number(r))
-          .map(([i, r]) => {
-            const [n = '', a = '0'] = r.split('|');
-            return {
-              number: Number(i),
-              title: n,
-              script: toNumber(a),
-            };
-          })
+            .filter(([i]) => /^\d+$/.test(i))
+            .sort(([i], [r]) => Number(i) - Number(r))
+            .map(([i, r]) => {
+              const [n = '', a = '0'] = r.split('|');
+              return {
+                number: Number(i),
+                title: n,
+                script: toNumber(a),
+              };
+            })
         : parseChapters(t).filter((i) => i.script > 0);
   }
   startChapterSession(e, t) {
@@ -3635,16 +3639,16 @@ class RageOfMagicGame {
     !this.chapterPanel ||
       !this.chapterSession ||
       ((this.chapterIndex = e),
-        (this.chapterMove = {
-          startX: this.chapterPanel.x,
-          startY: this.chapterPanel.y,
-          targetX: (SCREEN_WIDTH - MENU_MAX_HEIGHT) / 2,
-          targetY: menuTopY(e, SCREEN_HEIGHT),
-          step: 0,
-          steps: MENU_SLIDE_STEPS,
-        }),
-        this.playSound('click'),
-        this.refreshChapterCursor());
+      (this.chapterMove = {
+        startX: this.chapterPanel.x,
+        startY: this.chapterPanel.y,
+        targetX: (SCREEN_WIDTH - MENU_MAX_HEIGHT) / 2,
+        targetY: menuTopY(e, SCREEN_HEIGHT),
+        step: 0,
+        steps: MENU_SLIDE_STEPS,
+      }),
+      this.playSound('click'),
+      this.refreshChapterCursor());
   }
   stepChapterScreen() {
     if (!this.chapterPanel || !this.chapterSession) return;
@@ -3659,16 +3663,16 @@ class RageOfMagicGame {
         Math.trunc(easeIn(e.startX, e.targetX, e.step, e.steps)),
         Math.trunc(easeIn(e.startY, e.targetY, e.step, e.steps)),
       ),
-        e.step <= e.steps
-          ? (e.step += 1)
-          : (this.chapterPanel.position.set(Math.trunc(e.targetX), Math.trunc(e.targetY)),
-            (this.chapterMove = void 0))),
+      e.step <= e.steps
+        ? (e.step += 1)
+        : (this.chapterPanel.position.set(Math.trunc(e.targetX), Math.trunc(e.targetY)),
+          (this.chapterMove = void 0))),
       this.chapterFadeOverlay &&
-      (this.chapterFadeOverlay.alpha = Math.max(0, 1 - this.screenFrame / 10)),
+        (this.chapterFadeOverlay.alpha = Math.max(0, 1 - this.screenFrame / 10)),
       this.refreshChapterCursor(),
       !this.chapterSession.replay &&
-      this.chapterIdleFrames++ >= CHAPTER_AUTOSELECT_FRAMES &&
-      this.chooseChapter());
+        this.chapterIdleFrames++ >= CHAPTER_AUTOSELECT_FRAMES &&
+        this.chooseChapter());
   }
   chooseChapter() {
     const e = this.chapterSession,
@@ -3691,17 +3695,17 @@ class RageOfMagicGame {
             this.selectedPlayers.length >= 2
               ? this.selectedPlayers
               : [
-                newSelectPlayer(0, {
-                  didJoin: !0,
-                  character: 0,
-                  controller: 0,
-                }),
-                newSelectPlayer(1, {
-                  didJoin: !1,
-                  character: 1,
-                  controller: 1,
-                }),
-              ];
+                  newSelectPlayer(0, {
+                    didJoin: !0,
+                    character: 0,
+                    controller: 0,
+                  }),
+                  newSelectPlayer(1, {
+                    didJoin: !1,
+                    character: 1,
+                    controller: 1,
+                  }),
+                ];
         ((this.selectedPlayers = r.map((n, a) => ({
           ...n,
           didJoin: a === 0 ? !0 : n.didJoin,
@@ -3726,13 +3730,13 @@ class RageOfMagicGame {
         (e.replay ||
           (e.mode === 'arcade' &&
             ((this.progress.arcadeWon = !0),
-              (this.progress.arcadeChapter = t.number),
-              (this.progress.arcadeMaxChapter = 99999)),
-            e.mode === 'arena' &&
+            (this.progress.arcadeChapter = t.number),
+            (this.progress.arcadeMaxChapter = 99999)),
+          e.mode === 'arena' &&
             ((this.progress.arenaWon = !0),
-              (this.progress.arenaChapter = t.number),
-              (this.progress.arenaMaxChapter = 99999)),
-            this.saveProgress()),
+            (this.progress.arenaChapter = t.number),
+            (this.progress.arenaMaxChapter = 99999)),
+          this.saveProgress()),
           this.beginUiScreenFade(() =>
             this.openNovel(`${e.mode}-win`, e.replay ? 'chapter' : 'menu', !0),
           ));
@@ -3795,7 +3799,7 @@ class RageOfMagicGame {
       o.characterActor && r.add(o.characterActor);
       if (
         (h && r.add(`${c}.${h}`),
-          this.sourceMode === 'arena' ||
+        this.sourceMode === 'arena' ||
           this.sourceMode === 'survival' ||
           this.sourceMode === 'versus')
       ) {
@@ -3804,7 +3808,7 @@ class RageOfMagicGame {
             const d = ALLY_ACTOR_IDS[u];
             (r.add(d),
               this.recolorAllies &&
-              r.add(`${d}.@${this.sourceMode === 'versus' ? n.indexOf(o) + 1 : 0}`));
+                r.add(`${d}.@${this.sourceMode === 'versus' ? n.indexOf(o) + 1 : 0}`));
           }
       }
     }
@@ -3856,9 +3860,9 @@ class RageOfMagicGame {
       (this.screenFrame = 0),
       t
         ? this.pendingScripts.push({
-          id: e.scriptId,
-          line: 1,
-        })
+            id: e.scriptId,
+            line: 1,
+          })
         : this.runScript(e.scriptId, 1),
       this.emitState(!0));
   }
@@ -3947,7 +3951,7 @@ class RageOfMagicGame {
         (e.readyFrames === 0 && this.renderStaticScreen(),
           (e.readyFrames += 1),
           e.readyFrames >= 2 &&
-          ((e.phase = 'loading-fade-out'),
+            ((e.phase = 'loading-fade-out'),
             (e.step = 0),
             (e.steps = SPLASH_RATE),
             this.applySceneTransitionHue(0)));
@@ -3961,8 +3965,8 @@ class RageOfMagicGame {
     !t ||
       this.sceneTransition !== e ||
       ((this.sceneTransition = void 0),
-        this.clearSceneTransitionHue(),
-        this.activatePreparedScene(t, !1));
+      this.clearSceneTransitionHue(),
+      this.activatePreparedScene(t, !1));
   }
   resetScene(e, t) {
     (this.clearActors(),
@@ -4122,7 +4126,7 @@ class RageOfMagicGame {
     // Seconds are counted the way the game's own timer counts them.
     ((this.survivalTick += 1),
       this.survivalTick > this.sourceGameRate() &&
-      ((this.survivalSeconds += 1), (this.survivalTick = 0)));
+        ((this.survivalSeconds += 1), (this.survivalTick = 0)));
     if (!this.enemiesDead(!0)) {
       this.survivalBreak = WAVE_BREAK_FRAMES;
       return;
@@ -4137,9 +4141,9 @@ class RageOfMagicGame {
   /** The run is over: keep the score, put the summary up. */
   endSurvivalRun() {
     const e = this.progress.survivalBest ?? {
-      waves: 0,
-      seconds: 0,
-    },
+        waves: 0,
+        seconds: 0,
+      },
       t = this.survivalWave > e.waves,
       i = this.survivalSeconds > e.seconds;
     ((this.progress.survivalBest = {
@@ -4148,6 +4152,10 @@ class RageOfMagicGame {
     }),
       this.saveProgress(),
       this.audio.stopAll(),
+      // Clear the fight's captions and floating lines so the summary stands alone.
+      this.closeAllLines(),
+      (this.caption = void 0),
+      (this.mission = void 0),
       (this.survivalResult = {
         waves: this.survivalWave,
         seconds: this.survivalSeconds,
@@ -4155,7 +4163,7 @@ class RageOfMagicGame {
         bestSeconds: this.progress.survivalBest.seconds,
         record: t || i,
       }),
-      this.playSound('012a'),
+      this.playSound(SURVIVAL_DEATH_SOUND),
       this.renderHud());
   }
   finishSurvivalRun() {
@@ -4173,54 +4181,68 @@ class RageOfMagicGame {
   drawSurvivalResult() {
     const e = this.survivalResult;
     if (!e) return;
-    const t = new Container();
+    const t = new Container(),
+      { width: i, height: r, colors: n } = SURVIVAL_RESULT,
+      a = Math.trunc((SCREEN_WIDTH - i) / 2),
+      o = Math.trunc((SCREEN_HEIGHT - r) / 2),
+      l = a + Math.trunc(i / 2),
+      c = new Graphics(),
+      h = (x, y, w, hh, color, alpha = 1) =>
+        c.rect(x, y, w, hh).fill({
+          color,
+          alpha,
+        });
     t.addChild(
       new Graphics().rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT).fill({
         color: 0,
-        alpha: 0.55,
+        alpha: 0.62,
       }),
     );
-    const i = this.sourceCroppedTexture('ui.guiform', SURVIVAL_RESULT.form),
-      r = i
-        ? Math.trunc((SCREEN_WIDTH - i.width) / 2)
-        : Math.trunc((SCREEN_WIDTH - SURVIVAL_RESULT.width) / 2),
-      n = i
-        ? Math.trunc((SCREEN_HEIGHT - i.height) / 2)
-        : Math.trunc((SCREEN_HEIGHT - SURVIVAL_RESULT.height) / 2),
-      a = i ? i.width : SURVIVAL_RESULT.width;
-    if (i) {
-      const c = new Sprite(i);
-      (c.position.set(r, n), t.addChild(c));
-    } else
-      t.addChild(
-        new Graphics().rect(r, n, a, SURVIVAL_RESULT.height).fill({
-          color: 0,
-          alpha: 0.9,
-        }),
-      );
-    // The character that just fell, beside the title.
-    const o = this.actor('p1') ?? this.player;
-    (o && this.addSourceActorIcon(t, o.sprite ?? o.main, 0, 24, r + 28, n + 16),
-      this.addSourceBitmap(t, 3, 'SURVIVAL OVER', r + Math.trunc(a / 2), n + 12, !0));
-    let l = n + 46;
-    for (const c of survivalResultRows(e)) {
-      // This run in white, the best in blue, with a rule between the two pairs.
-      const h = c.best ? 1 : 0;
-      (this.addSourceBitmap(t, h, c.label, r + 40, l),
-        this.addSourceBitmap(t, h, c.value, r + a - 40 - this.sourceBitmapWidth(h, c.value), l),
-        (l += 13),
-        c.label === 'Time Survived' &&
-        (t.addChild(
-          new Graphics().rect(r + 40, l + 3, a - 80, 1).fill({
-            color: 5395026,
-            alpha: 0.8,
-          }),
-        ),
-          (l += 6)));
-    }
-    (e.record && this.addSourceBitmap(t, 5, 'A NEW BEST!', r + Math.trunc(a / 2), l, !0),
+    (h(a, o, i, r, n.panel, 0.95),
+      h(a + 1, o + 1, i - 2, SURVIVAL_RESULT.headerHeight, n.header, 0.95));
+    // Frame: an outer line, an inner line, and gold corners like the game's own.
+    (h(a, o, i, 1, n.border),
+      h(a, o + r - 1, i, 1, n.border),
+      h(a, o, 1, r, n.border),
+      h(a + i - 1, o, 1, r, n.border),
+      h(a + 3, o + 3, i - 6, 1, n.innerBorder),
+      h(a + 3, o + r - 4, i - 6, 1, n.innerBorder),
+      h(a + 3, o + 3, 1, r - 6, n.innerBorder),
+      h(a + i - 4, o + 3, 1, r - 6, n.innerBorder));
+    for (const [x, y] of [
+      [a + 3, o + 3],
+      [a + i - 13, o + 3],
+      [a + 3, o + r - 4],
+      [a + i - 13, o + r - 4],
+    ])
+      h(x, y, 10, 1, n.gold);
+    for (const [x, y] of [
+      [a + 3, o + 3],
+      [a + i - 4, o + 3],
+      [a + 3, o + r - 13],
+      [a + i - 4, o + r - 13],
+    ])
+      h(x, y, 1, 10, n.gold);
+    for (const y of SURVIVAL_RESULT.rules) h(a + 14, o + y, i - 28, 1, n.rule, 0.8);
+    t.addChild(c);
+    this.addSourceBitmap(t, 3, 'SURVIVAL OVER', l, o + SURVIVAL_RESULT.titleY, !0);
+    // The two figures side by side, each over the record it is chasing.
+    survivalResultColumns(e).forEach((u, d) => {
+      const f = a + Math.trunc((i * (1 + 2 * d)) / 4);
+      (this.addSourceBitmap(t, 1, u.label, f, o + SURVIVAL_RESULT.labelY, !0),
+        this.addSourceBitmap(t, 2, u.value, f, o + SURVIVAL_RESULT.valueY, !0),
+        this.addSourceBitmap(t, 1, u.best, f, o + SURVIVAL_RESULT.bestY, !0));
+    });
+    (e.record && this.addSourceBitmap(t, 5, 'A NEW BEST!', l, o + SURVIVAL_RESULT.recordY, !0),
       Math.floor(this.frame / 15) % 2 === 0 &&
-      this.addSourceBitmap(t, 0, 'Press Any Button', r + Math.trunc(a / 2), l + 14, !0),
+        this.addSourceBitmap(
+          t,
+          0,
+          'Press Any Button',
+          l,
+          o + (e.record ? SURVIVAL_RESULT.promptY : SURVIVAL_RESULT.promptOnlyY),
+          !0,
+        ),
       this.hudLayer.addChild(t));
   }
   startSurvivalWave() {
@@ -4328,16 +4350,16 @@ class RageOfMagicGame {
   beginPlaySplashFade() {
     this.playSplashFade ||
       (this.clearAllSourceInputs(),
-        (this.playSplashFade = {
-          step: 0,
-          steps: 10,
-          filter:
-            typeof document > 'u'
-              ? void 0
-              : new ColorMatrixFilter({
+      (this.playSplashFade = {
+        step: 0,
+        steps: 10,
+        filter:
+          typeof document > 'u'
+            ? void 0
+            : new ColorMatrixFilter({
                 padding: 0,
               }),
-        }));
+      }));
   }
   stepPlaySplashFade() {
     const e = this.playSplashFade;
@@ -4377,8 +4399,8 @@ class RageOfMagicGame {
     const i = stepQuestion(t.state, e);
     if (
       ((t.state = i.state),
-        'sound' in i && i.sound && this.playSound(i.sound),
-        i.kind === 'dismiss')
+      'sound' in i && i.sound && this.playSound(i.sound),
+      i.kind === 'dismiss')
     ) {
       this.closePlayQuestion();
       return;
@@ -4402,17 +4424,17 @@ class RageOfMagicGame {
   beginPlayExitFade() {
     this.playExitFade ||
       (this.stopCurrentMusic(),
-        this.clearAllSourceInputs(),
-        (this.playExitFade = {
-          step: 0,
-          next: 'menu',
-          filter:
-            typeof document > 'u'
-              ? void 0
-              : new ColorMatrixFilter({
+      this.clearAllSourceInputs(),
+      (this.playExitFade = {
+        step: 0,
+        next: 'menu',
+        filter:
+          typeof document > 'u'
+            ? void 0
+            : new ColorMatrixFilter({
                 padding: 0,
               }),
-        }));
+      }));
   }
   stepPlayExitFade() {
     const e = this.playExitFade;
@@ -4431,12 +4453,12 @@ class RageOfMagicGame {
   }
   sourceVersusPlayerSnapshot(e) {
     const t =
-      this.selectedPlayers[e] ??
-      newSelectPlayer(e, {
-        didJoin: e === 0,
-        character: e,
-        controller: e,
-      }),
+        this.selectedPlayers[e] ??
+        newSelectPlayer(e, {
+          didJoin: e === 0,
+          character: e,
+          controller: e,
+        }),
       i = this.sourcePlayerActors.get(e + 1) ?? this.actors.find((r) => r.id === `p${e + 1}`);
     return {
       didJoin: t.didJoin,
@@ -4447,12 +4469,12 @@ class RageOfMagicGame {
       loss: t.loss,
       actor: i
         ? {
-          hp: i.hp,
-          totalHp: i.totalHp,
-          score: i.score,
-          kills: this.playerKillCounts.get(i) ?? (e === 0 ? this.playerKills : 0),
-          statTime: this.timer,
-        }
+            hp: i.hp,
+            totalHp: i.totalHp,
+            score: i.score,
+            kills: this.playerKillCounts.get(i) ?? (e === 0 ? this.playerKills : 0),
+            statTime: this.timer,
+          }
         : null,
     };
   }
@@ -4532,11 +4554,11 @@ class RageOfMagicGame {
     }
     if (
       (this.storeVersusPlayers(e.players),
-        this.clearVersusEndFlow(),
-        (this.dataName = 'extra'),
-        (this.mode = 'versus'),
-        (this.sourceMode = 'versus'),
-        e.kind === 'replay-return')
+      this.clearVersusEndFlow(),
+      (this.dataName = 'extra'),
+      (this.mode = 'versus'),
+      (this.sourceMode = 'versus'),
+      e.kind === 'replay-return')
     ) {
       (this.clearAllSourceInputs(), this.startSameScreenScene(51));
       return;
@@ -4577,10 +4599,10 @@ class RageOfMagicGame {
     ((this.gameChapter += 1),
       (this.progress.arcadeChapter = this.gameChapter),
       this.progress.arcadeWon ||
-      (this.progress.arcadeMaxChapter = Math.max(
-        this.progress.arcadeMaxChapter,
-        this.gameChapter,
-      )),
+        (this.progress.arcadeMaxChapter = Math.max(
+          this.progress.arcadeMaxChapter,
+          this.gameChapter,
+        )),
       this.saveProgress());
     const e = parseChapters(this.manifest.data.arcade).filter((r) => r.script > 0),
       t = e.findIndex((r) => r.number === this.gameChapter),
@@ -4628,19 +4650,19 @@ class RageOfMagicGame {
     (this.stepHudAfterDraw(),
       this.stepHue(),
       !this.processActors(e) &&
-      (this.stepMessages(),
+        (this.stepMessages(),
         this.statsTransitionFrames > 0 &&
-        (!this.statsTransitionOpening &&
-          this.statsTransitionFrames === 11 &&
-          this.closeAllLines(),
+          (!this.statsTransitionOpening &&
+            this.statsTransitionFrames === 11 &&
+            this.closeAllLines(),
           (this.statsTransitionFrames -= 1)),
         this.helpClosingFrames > 0
           ? ((this.helpClosingFrames -= 1), this.helpClosingFrames === 0 && (this.helpFrames = 0))
           : this.helpFrames > 0 && (this.helpFrames -= 1),
         this.timerRunning &&
-        this.timer >= 0 &&
-        (this.statsVisible || this.statsTransitionFrames > 0) &&
-        ((this.timerTick += 1),
+          this.timer >= 0 &&
+          (this.statsVisible || this.statsTransitionFrames > 0) &&
+          ((this.timerTick += 1),
           this.timerTick > this.sourceGameRate() + 1 && ((this.timer -= 1), (this.timerTick = 0)),
           this.timer < 0 && (this.timer = 0)),
         this.stepSlowRate()));
@@ -4779,9 +4801,9 @@ class RageOfMagicGame {
         .catch(() => {
           a === this.hudLoadToken[e] &&
             ((t.didJoin = !1),
-              (this.hudStatMode[e] = 'start'),
-              (this.hudStartDelay[e] = 0),
-              this.playSound('error'));
+            (this.hudStatMode[e] = 'start'),
+            (this.hudStartDelay[e] = 0),
+            this.playSound('error'));
         }));
   }
   materializeReadyHudPlayers() {
@@ -4826,35 +4848,35 @@ class RageOfMagicGame {
       n = this.playerInputStates.get(e);
     return (
       n ||
-      ((n = {
-        queue: [0, 0, 0, 0],
-        zeroRepeat: 0,
-        didDouble: !1,
-      }),
+        ((n = {
+          queue: [0, 0, 0, 0],
+          zeroRepeat: 0,
+          didDouble: !1,
+        }),
         this.playerInputStates.set(e, n)),
       r === Input.NOTHING
         ? ((n.zeroRepeat += 1),
           n.zeroRepeat >= 3 && (this.pushInput(n, Input.NOTHING), (n.zeroRepeat = 0)))
         : r !== n.queue[0] && (this.pushInput(n, r), (n.zeroRepeat = 0)),
       n.queue[0] === Input.FORWARD &&
-        n.queue[1] === 0 &&
-        n.queue[2] === Input.FORWARD &&
-        n.queue[3] === 0
+      n.queue[1] === 0 &&
+      n.queue[2] === Input.FORWARD &&
+      n.queue[3] === 0
         ? ((r = Input.RUN_FORWARD), (n.queue[0] = -1), (n.didDouble = !0))
         : n.queue[0] === Input.BACKWARD &&
-          n.queue[1] === 0 &&
-          n.queue[2] === Input.BACKWARD &&
-          n.queue[3] === 0
+            n.queue[1] === 0 &&
+            n.queue[2] === Input.BACKWARD &&
+            n.queue[3] === 0
           ? ((r = Input.RUN_BACKWARD), (n.queue[0] = -1), (n.didDouble = !0))
           : n.queue[0] === Input.UP &&
-            n.queue[1] === 0 &&
-            n.queue[2] === Input.UP &&
-            n.queue[3] === 0
+              n.queue[1] === 0 &&
+              n.queue[2] === Input.UP &&
+              n.queue[3] === 0
             ? ((r = Input.HOP_UP), (n.queue[0] = -1), (n.didDouble = !0))
             : n.queue[0] === Input.DOWN &&
-              n.queue[1] === 0 &&
-              n.queue[2] === Input.DOWN &&
-              n.queue[3] === 0
+                n.queue[1] === 0 &&
+                n.queue[2] === Input.DOWN &&
+                n.queue[3] === 0
               ? ((r = Input.HOP_DOWN), (n.queue[0] = -1), (n.didDouble = !0))
               : n.didDouble && ((n.queue[0] = -1), (n.didDouble = !1)),
       r
@@ -4907,8 +4929,8 @@ class RageOfMagicGame {
         const w = this.resolveHit(S.attacker, r, S.frame, !0, S);
         w.accepted &&
           (w.nextAction >= 0 && (f = w.nextAction),
-            w.absorbed && (b = !0),
-            S.frame.damageVector.length && x.push(S));
+          w.absorbed && (b = !0),
+          S.frame.damageVector.length && x.push(S));
       }
       b && (x.length = 0);
       for (let S = this.pendingActorInputs.length - 1; S >= 0; S -= 1)
@@ -4942,8 +4964,8 @@ class RageOfMagicGame {
       const _ = this.superActor ? void 0 : r.stepComboClock(this.sourceMode !== 'tutorial');
       if (
         (_ !== void 0 && this.awardCombo(r, _),
-          r.hp <= 0 && (r.deadFrames += 1),
-          this.pendingSuperStart)
+        r.hp <= 0 && (r.deadFrames += 1),
+        this.pendingSuperStart)
       )
         break;
     }
@@ -4955,17 +4977,17 @@ class RageOfMagicGame {
       const n = this.actors[r];
       n.removed &&
         (this.actionSeen.delete(n),
-          this.fighterControllers.delete(n),
-          this.scriptProcessorBumps.delete(n),
-          this.animalProcessors.delete(n),
-          this.clericProcessors.delete(n),
-          this.fairyProcessors.delete(n),
-          this.wispProcessors.delete(n),
-          this.circleProcessors.delete(n),
-          this.trackProcessors.delete(n),
-          this.playerInputStates.delete(n),
-          n.role === 'player' && (this.playersChanged = !0),
-          this.actors.splice(r, 1));
+        this.fighterControllers.delete(n),
+        this.scriptProcessorBumps.delete(n),
+        this.animalProcessors.delete(n),
+        this.clericProcessors.delete(n),
+        this.fairyProcessors.delete(n),
+        this.wispProcessors.delete(n),
+        this.circleProcessors.delete(n),
+        this.trackProcessors.delete(n),
+        this.playerInputStates.delete(n),
+        n.role === 'player' && (this.playersChanged = !0),
+        this.actors.splice(r, 1));
     }
     if (this.playersChanged && this.sourceMode !== 'versus') {
       const r = [...this.sourcePlayerActors.values()].filter((a) => a.hp > 0).length,
@@ -4991,13 +5013,13 @@ class RageOfMagicGame {
     const t = e.consumeFeedback();
     if (
       (t.rageDepleted && this.playSound('tong'),
-        t.superLevelGained &&
+      t.superLevelGained &&
         (this.playSound('tong'),
-          this.hueActorForHit(e, 32, this.actorMagicSpl(e)),
-          e.role === 'player' &&
+        this.hueActorForHit(e, 32, this.actorMagicSpl(e)),
+        e.role === 'player' &&
           (this.setSlow(10 * e.spl, 0.85),
-            this.openLine(this.playerLineIndex(e), `Go Super${e.spl > 1 ? ` ${e.spl}x` : ''}!`))),
-        !t.resourceFailure || e.role !== 'player')
+          this.openLine(this.playerLineIndex(e), `Go Super${e.spl > 1 ? ` ${e.spl}x` : ''}!`))),
+      !t.resourceFailure || e.role !== 'player')
     )
       return;
     const i = e.id === 'p2' ? 1 : 0;
@@ -5010,11 +5032,11 @@ class RageOfMagicGame {
     const t = e.action();
     t &&
       (this.applyActorActionEffect(e),
-        t.audioStop && this.audio.stopVoice(e.currentActionAudio),
-        t.audio && (e.currentActionAudio = this.playCameraSoundAt(t.audio, e.x)),
-        t.typeCall >= 0 && this.spawnActionActors(e, t.typeCall, t.typeCallParticle),
-        this.applyActionSceneEffect(e),
-        t.sceneCall === 1 && e.jump < 1 && this.spawnActionDust(e));
+      t.audioStop && this.audio.stopVoice(e.currentActionAudio),
+      t.audio && (e.currentActionAudio = this.playCameraSoundAt(t.audio, e.x)),
+      t.typeCall >= 0 && this.spawnActionActors(e, t.typeCall, t.typeCallParticle),
+      this.applyActionSceneEffect(e),
+      t.sceneCall === 1 && e.jump < 1 && this.spawnActionDust(e));
   }
   actorMagicSpl(e) {
     return e.calculateMagicSpl();
@@ -5036,10 +5058,10 @@ class RageOfMagicGame {
     const r =
       i < 0
         ? {
-          r: 100,
-          g: 0,
-          b: 0,
-        }
+            r: 100,
+            g: 0,
+            b: 0,
+          }
         : this.actorMagicHue(e, i);
     e.setHue(t, Math.trunc(r.r / 3), Math.trunc(r.g / 3), Math.trunc(r.b / 3));
   }
@@ -5048,7 +5070,7 @@ class RageOfMagicGame {
     !t ||
       (t.actionEffect !== 2 && t.actionEffect !== 3) ||
       (t.actionEffect === 2 && this.playCameraSoundAt('failure', e.x),
-        t.bodyType === 0 &&
+      t.bodyType === 0 &&
         this.spawnBloodParticles(
           void 0,
           -1,
@@ -5061,7 +5083,7 @@ class RageOfMagicGame {
           1,
           1,
         ),
-        this.hueActorWithMagic(e, 1));
+      this.hueActorWithMagic(e, 1));
   }
   setMagicScreenHue(e, t, i) {
     if (t <= 0 || this.superActor) return;
@@ -5095,16 +5117,16 @@ class RageOfMagicGame {
       if (t.sceneEffect === 3) {
         (this.hueActorWithMagic(e, 2),
           !this.superActor &&
-          !this.pendingSuperStart &&
-          e.x >= this.cameraX - 128 &&
-          e.x <= this.cameraX + SCREEN_WIDTH + 128 &&
-          (this.pendingSuperStart = e),
+            !this.pendingSuperStart &&
+            e.x >= this.cameraX - 128 &&
+            e.x <= this.cameraX + SCREEN_WIDTH + 128 &&
+            (this.pendingSuperStart = e),
           this.spawnSuperSpark(e),
           e.role === 'player'
             ? this.openLine(this.playerLineIndex(e), `${t.title}!`)
             : e.role === 'boss' &&
-            this.sourceMode === 'arcade' &&
-            (this.player && (this.player.whoIHit = e), this.openLine(99999, `${t.title}!`)));
+              this.sourceMode === 'arcade' &&
+              (this.player && (this.player.whoIHit = e), this.openLine(99999, `${t.title}!`)));
         return;
       }
       t.sceneEffect === 4 &&
@@ -5175,9 +5197,9 @@ class RageOfMagicGame {
     });
     t &&
       ((t.parent = e.parent),
-        (t.spl = t.usedSpl = this.actorMagicSpl(e)),
-        (t.speedX = -2),
-        (t.speedJump = 2));
+      (t.spl = t.usedSpl = this.actorMagicSpl(e)),
+      (t.speedX = -2),
+      (t.speedJump = 2));
   }
   spawnActionDust(e) {
     for (let t = 0; t < 3; t += 1) {
@@ -5225,8 +5247,8 @@ class RageOfMagicGame {
         g = p + Math.trunc(m * 0.25) + 1;
       if (
         (boxesOverlap(a, u) && ((e.x = e.speedX > 0 ? u.x1 - f - 1 : u.x2 + f + 1), (d = !0)),
-          boxesOverlap(o, u) && ((e.y = e.speedY > 0 ? u.y1 - g * 0.25 : u.y2 + p + 1), (d = !0)),
-          d)
+        boxesOverlap(o, u) && ((e.y = e.speedY > 0 ? u.y1 - g * 0.25 : u.y2 + p + 1), (d = !0)),
+        d)
       )
         return (this.notifyProcessorBumped(e), (e.aiWait = Math.max(e.aiWait, 4)), i.onStopped);
     }
@@ -5264,8 +5286,8 @@ class RageOfMagicGame {
     for (const p of this.sceneStops)
       if (
         (boxesOverlap(h, p) && ((e.x = t > 0 ? p.x1 - n - 1 : p.x2 + n + 1), (t = 0), (r = !0)),
-          boxesOverlap(u, p) && ((e.y = i > 0 ? p.y1 - c : p.y2 + o + 1), (i = 0), (r = !0)),
-          r)
+        boxesOverlap(u, p) && ((e.y = i > 0 ? p.y1 - c : p.y2 + o + 1), (i = 0), (r = !0)),
+        r)
       )
         break;
     if (e.action()?.bodyType === -1)
@@ -5308,8 +5330,8 @@ class RageOfMagicGame {
         boxesOverlap(e.groundRect(e.x + t, e.y), g) &&
         ((e.x = t > 0 ? g.x1 - n - 1 : g.x2 + n + 1), (t = 0), (r = !0)),
         i !== 0 &&
-        boxesOverlap(e.groundRect(e.x, e.y + i), g) &&
-        ((e.y = i > 0 ? g.y1 - c : g.y2 + o + 1), (i = 0), (r = !0)));
+          boxesOverlap(e.groundRect(e.x, e.y + i), g) &&
+          ((e.y = i > 0 ? g.y1 - c : g.y2 + o + 1), (i = 0), (r = !0)));
     }
     return {
       x: t,
@@ -5456,8 +5478,8 @@ class RageOfMagicGame {
   notifyProcessorBumped(e) {
     if (
       (e.process === 'script' && this.scriptProcessorBumps.add(e),
-        this.fighterControllers.get(e)?.onBumped(),
-        e.controllerKind === 'animal')
+      this.fighterControllers.get(e)?.onBumped(),
+      e.controllerKind === 'animal')
     ) {
       let t = this.animalProcessors.get(e);
       (t || ((t = newAllyMemory()), this.animalProcessors.set(e, t)), markAllyBumped(t));
@@ -5505,15 +5527,15 @@ class RageOfMagicGame {
     return !r || !n
       ? !0
       : !this.actors.some(
-        (a) =>
-          a !== e &&
-          !a.removed &&
-          a.processType !== 'script' &&
-          a.action()?.bodyType !== -1 &&
-          !a.type.walkThrough &&
-          !boxesOverlap(n, a.groundRect()) &&
-          boxesOverlap(r, a.groundRect()),
-      );
+          (a) =>
+            a !== e &&
+            !a.removed &&
+            a.processType !== 'script' &&
+            a.action()?.bodyType !== -1 &&
+            !a.type.walkThrough &&
+            !boxesOverlap(n, a.groundRect()) &&
+            boxesOverlap(r, a.groundRect()),
+        );
   }
   isAiSpotClear(e, t, i, r) {
     return (!e.isRetreating && !e.outside && (t < this.playerMinX || t > this.playerMaxX)) ||
@@ -5530,16 +5552,16 @@ class RageOfMagicGame {
       : this.sceneStops.some((o) => boxesOverlap(n, o))
         ? !1
         : !this.actors.some(
-          (o) =>
-            o !== e &&
-            o !== r &&
-            !o.removed &&
-            o.processType !== 'script' &&
-            o.action()?.bodyType !== -1 &&
-            !o.type.walkThrough &&
-            !boxesOverlap(a, o.groundRect()) &&
-            boxesOverlap(n, o.groundRect()),
-        );
+            (o) =>
+              o !== e &&
+              o !== r &&
+              !o.removed &&
+              o.processType !== 'script' &&
+              o.action()?.bodyType !== -1 &&
+              !o.type.walkThrough &&
+              !boxesOverlap(a, o.groundRect()) &&
+              boxesOverlap(n, o.groundRect()),
+          );
   }
   isAiPathClear(e, t, i, r) {
     if (
@@ -5568,9 +5590,9 @@ class RageOfMagicGame {
     const n = t.frame()?.body;
     return n
       ? boxesOverlap(
-        worldBox(r.range, e.face, e.x, e.y, e.jump),
-        worldBox(n, t.face, t.x, t.y, t.jump),
-      )
+          worldBox(r.range, e.face, e.x, e.y, e.jump),
+          worldBox(n, t.face, t.x, t.y, t.jump),
+        )
       : !1;
   }
   aiAttackRange(e, t) {
@@ -5612,16 +5634,16 @@ class RageOfMagicGame {
         !e.canDepthHit(o, n) ||
         !boxesOverlap(a, c) ||
         (e.controllerKind === 'wisp' && (e.didContact = !0),
-          e.hitTrack.get(o) === n.id && n.damageType !== 60) ||
+        e.hitTrack.get(o) === n.id && n.damageType !== 60) ||
         (e.hitTrack.set(o, n.id), o.airJuggles >= MIN_HIT_OVERLAP)
       )
         continue;
       const h = {
-        x1: Math.max(a.x1, c.x1),
-        y1: Math.max(a.y1, c.y1),
-        x2: Math.min(a.x2, c.x2),
-        y2: Math.min(a.y2, c.y2),
-      },
+          x1: Math.max(a.x1, c.x1),
+          y1: Math.max(a.y1, c.y1),
+          x2: Math.min(a.x2, c.x2),
+          y2: Math.min(a.y2, c.y2),
+        },
         u = h.x1 + Math.trunc((h.x2 - h.x1) / 2),
         d = h.y1 + Math.trunc((h.y2 - h.y1) / 2),
         f = Math.trunc(o.y) - d;
@@ -5636,12 +5658,12 @@ class RageOfMagicGame {
           continue;
         (t
           ? this.pendingActorInputs.push({
-            attacker: e,
-            target: o,
-            frame: n,
-            impactX: u,
-            impactJump: f,
-          })
+              attacker: e,
+              target: o,
+              frame: n,
+              impactX: u,
+              impactJump: f,
+            })
           : this.applyPickup(e, o, n),
           this.applyAttackSelfOutput(e, n));
         return;
@@ -5657,13 +5679,13 @@ class RageOfMagicGame {
         }
         if (
           (n.damageType === 70 && (e.didContact = !0),
-            n.damageType < 30 &&
+          n.damageType < 30 &&
             n.damageConnector &&
             ((e.didContact = !0),
-              e.type.passContact &&
+            e.type.passContact &&
               ((e.parent.didContact = !0), e.parent.isEnemy(o) && (e.parent.whoIHit = o))),
-            n.damageType < 30 && e.isEnemy(o) && (e.whoIHit = o),
-            n.damageType === 0)
+          n.damageType < 30 && e.isEnemy(o) && (e.whoIHit = o),
+          n.damageType === 0)
         ) {
           this.applyAttackSelfOutput(e, n);
           continue;
@@ -5671,19 +5693,19 @@ class RageOfMagicGame {
         if (
           (t
             ? this.pendingActorInputs.push({
-              attacker: e,
-              target: o,
-              frame: n,
-              impactX: u,
-              impactJump: f,
-            })
+                attacker: e,
+                target: o,
+                frame: n,
+                impactX: u,
+                impactJump: f,
+              })
             : this.resolveHit(e, o, n, !1, {
-              impactX: u,
-              impactJump: f,
-            }),
-            this.applyAttackSelfOutput(e, n),
-            !t && r.onContact >= 0 && e.didContact && e.changeAction(r.onContact),
-            n.damageType === 30)
+                impactX: u,
+                impactJump: f,
+              }),
+          this.applyAttackSelfOutput(e, n),
+          !t && r.onContact >= 0 && e.didContact && e.changeAction(r.onContact),
+          n.damageType === 30)
         )
           return;
       }
@@ -5717,20 +5739,20 @@ class RageOfMagicGame {
         i.damageAction === 2 &&
         (t.role === 'player' || t.role === 'boss') &&
         (this.setSlow(15, 0.95),
-          this.setHue(
-            15,
-            {
-              r: 128,
-              g: 128,
-              b: 128,
-            },
-            {
-              r: 0,
-              g: 0,
-              b: 0,
-            },
-          )),
-        i.damageType === 70)
+        this.setHue(
+          15,
+          {
+            r: 128,
+            g: 128,
+            b: 128,
+          },
+          {
+            r: 0,
+            g: 0,
+            b: 0,
+          },
+        )),
+      i.damageType === 70)
     ) {
       const f = Math.max(0, -u.damage);
       return (t.setHue(16, f + 32, f + 32, 0), u);
@@ -5755,9 +5777,9 @@ class RageOfMagicGame {
     if (
       (u.attacked &&
         (this.fighterControllers.get(t)?.onAttacked(e.parent ?? e),
-          t.process === 'script' && this.scriptProcessorBumps.add(t)),
-        (u.damage > 0 || u.blocked) && this.applySourceHitEffects(e, t, i, u, c, d, n),
-        u.damage > 0 && a)
+        t.process === 'script' && this.scriptProcessorBumps.add(t)),
+      (u.damage > 0 || u.blocked) && this.applySourceHitEffects(e, t, i, u, c, d, n),
+      u.damage > 0 && a)
     ) {
       const f =
         !u.blocked && i.damageType < 30 && t.type.actorType !== 1 && Math.trunc(o - u.damage) <= 0;
@@ -5767,7 +5789,7 @@ class RageOfMagicGame {
       const m = e.parent ?? e;
       if (
         (!u.blocked && !f && t.type.killScore > 0 && t.isEnemy(e) && e.countComboHit(),
-          !u.blocked && !f && t.type.killScore > 0 && m.isEnemy(t))
+        !u.blocked && !f && t.type.killScore > 0 && m.isEnemy(t))
       ) {
         const p = i.damageType === 20 ? u.damage / 3 : u.damage;
         m.addSuper(p);
@@ -5784,7 +5806,7 @@ class RageOfMagicGame {
       }
       if (
         (f && this.dropPickups(t, e.face),
-          !u.blocked && i.damageType === 20 && c !== 4 && (e.parent ?? e).bonusRefract > 0)
+        !u.blocked && i.damageType === 20 && c !== 4 && (e.parent ?? e).bonusRefract > 0)
       ) {
         const p = e.parent ?? e;
         ((p.didRefract = !0),
@@ -5795,18 +5817,18 @@ class RageOfMagicGame {
         ? ((t.didWarning = !0),
           this.addActorBonuses(t, t.type.dieBonuses) && (t.airJuggles = MIN_HIT_OVERLAP),
           t.role === 'player' &&
-          (this.setSlow(20, 0.95),
+            (this.setSlow(20, 0.95),
             this.openLine(this.playerLineIndex(t), 'Near Death!'),
             this.playSound('warning')))
         : this.sceneDamage &&
-        t.hp <= 0 &&
-        ((i.damageType === 1 ||
-          i.damageType === 2 ||
-          i.damageType === 20 ||
-          i.damageType === 21 ||
-          (i.damageType === 3 && (c === 0 || c === 5))) &&
-          (t.role === 'player' || t.role === 'boss') &&
-          this.setSlow(30, 0.95),
+          t.hp <= 0 &&
+          ((i.damageType === 1 ||
+            i.damageType === 2 ||
+            i.damageType === 20 ||
+            i.damageType === 21 ||
+            (i.damageType === 3 && (c === 0 || c === 5))) &&
+            (t.role === 'player' || t.role === 'boss') &&
+            this.setSlow(30, 0.95),
           t.role === 'player' && this.openLine(this.playerLineIndex(t), 'You Died!'));
     }
     return u;
@@ -5817,10 +5839,10 @@ class RageOfMagicGame {
     if (r) {
       if (
         (e.addScore(r.tier.score),
-          e.role === 'player' &&
+        e.role === 'player' &&
           ((this.score = Math.max(0, Math.min(9999999, this.score + r.tier.score))),
-            this.saveHighScore()),
-          r.tier.bonus >= 0)
+          this.saveHighScore()),
+        r.tier.bonus >= 0)
       ) {
         const n = Array(6).fill(0);
         ((n[r.tier.bonus] = 1), this.addActorBonuses(e, n));
@@ -5890,14 +5912,14 @@ class RageOfMagicGame {
       (a &&
         (i.damageAction === 2 &&
           (this.playCameraSoundAt('guardbrk', t.x),
-            this.spawnHitEffect(e, t, 7, {
-              spl: -1,
-              still: !0,
-              x: h,
-              jump: u,
-            })),
-          f(t.type.blockType)),
-        r.blocked)
+          this.spawnHitEffect(e, t, 7, {
+            spl: -1,
+            still: !0,
+            x: h,
+            jump: u,
+          })),
+        f(t.type.blockType)),
+      r.blocked)
     ) {
       (f(r.resisted ? n : t.type.blockType),
         r.resisted && t.setHue(16, r.damage * 2 + 52, -10, -5));
@@ -5911,7 +5933,7 @@ class RageOfMagicGame {
           x: h,
           jump: u,
         }),
-        i.damageType === 1)
+      i.damageType === 1)
     )
       (this.playCameraSoundAt(n === 2 ? 'hitwood' : l >= 10 ? 'bigpunch' : 'hitthud', h),
         t.hp <= 0 && this.hueActorForHit(t, 32, -1));
@@ -5961,7 +5983,7 @@ class RageOfMagicGame {
       });
     o &&
       ((r.spl ?? -1) >= 0 && (o.spl = o.usedSpl = r.spl),
-        r.still || ((o.speedX = -a * 2), (o.speedJump = 2)));
+      r.still || ((o.speedX = -a * 2), (o.speedJump = 2)));
   }
   spawnBloodParticles(e, t, i, r, n, a, o, l, c, h) {
     if ((!this.bloodEnabled && i === 0) || !this.manifest?.actors?.fx) return;
@@ -5985,9 +6007,9 @@ class RageOfMagicGame {
       });
       f &&
         (e && ((f.parent = e), (f.align = e.align)),
-          t >= 0 && (f.spl = f.usedSpl = t),
-          (f.speedX = o * (1 + Math.random() * c)),
-          (f.speedJump = 2 + Math.random() * h));
+        t >= 0 && (f.spl = f.usedSpl = t),
+        (f.speedX = o * (1 + Math.random() * c)),
+        (f.speedJump = 2 + Math.random() * h));
     }
   }
   spawnRefractedMagic(e, t, i = t.x, r = t.jump) {
@@ -6015,17 +6037,17 @@ class RageOfMagicGame {
       });
       h &&
         ((h.parent = e),
-          (h.spl = h.usedSpl = l),
-          (h.speedX = o * (5 + l)),
-          (h.speedY = (c - 1) * 3),
-          (h.speedJump = 2));
+        (h.spl = h.usedSpl = l),
+        (h.speedX = o * (5 + l)),
+        (h.speedY = (c - 1) * 3),
+        (h.speedJump = 2));
     }
   }
   applyAttackSelfOutput(e, t) {
     (t.selfDamage.length &&
       e.applySelfDamage(t.selfDamage[0] ?? 0, t.selfDamage[1] ?? 0, 0, this.sceneDamage),
       t.selfVector.length &&
-      e.addSpeed(e.face, t.selfVector[0] ?? 0, t.selfVector[1] ?? 0, t.selfVector[2] ?? 0));
+        e.addSpeed(e.face, t.selfVector[0] ?? 0, t.selfVector[1] ?? 0, t.selfVector[2] ?? 0));
   }
   resurrectActor(e) {
     ((e.mp = 0),
@@ -6055,21 +6077,21 @@ class RageOfMagicGame {
       e.role === 'player' && this.openLine(this.playerLineIndex(e), 'Life Ressurected!'),
       (e.role === 'player' || e.role === 'boss') && this.setSlow(30, 0.96),
       this.superActor ||
-      ((this.quake = startQuake(5)),
+        ((this.quake = startQuake(5)),
         (e.role === 'player' || e.role === 'boss') &&
-        this.setHue(
-          20,
-          {
-            r: 175,
-            g: 175,
-            b: 200,
-          },
-          {
-            r: 0,
-            g: 0,
-            b: 0,
-          },
-        )),
+          this.setHue(
+            20,
+            {
+              r: 175,
+              g: 175,
+              b: 200,
+            },
+            {
+              r: 0,
+              g: 0,
+              b: 0,
+            },
+          )),
       e.type.onFall
     );
   }
@@ -6124,8 +6146,8 @@ class RageOfMagicGame {
             : ((t.bonusLife += 1), a('Bonus Life!'))
           : n === 12 && i.damageTypeCall >= 0
             ? this.actors.filter(
-              (u) => !u.removed && u.leader === t && u.controllerKind === 'circle',
-            ).length >= 3 && this.sourceMode === 'arena'
+                (u) => !u.removed && u.leader === t && u.controllerKind === 'circle',
+              ).length >= 3 && this.sourceMode === 'arena'
               ? o()
               : (this.createCircleActor(t, e.main, i.damageTypeCall, e.sprite), a('Bonus Fairy!'))
             : n === 13
@@ -6140,15 +6162,15 @@ class RageOfMagicGame {
                   ? t.totalMp <= 0
                     ? o()
                     : (t.bonusRefract <= 0 && i.damageTypeCall >= 0
-                      ? this.createTrackedBonus(t, i.damageTypeCall, e.main, e.sprite)
-                      : (t.didRefract = !0),
+                        ? this.createTrackedBonus(t, i.damageTypeCall, e.main, e.sprite)
+                        : (t.didRefract = !0),
                       (t.bonusRefract += 25),
                       this.hueActorWithMagic(t, 2),
                       a('Bonus Refractor!'))
                   : n === 16
                     ? (t.bonusAbsorb <= 0 && i.damageTypeCall >= 0
-                      ? this.createTrackedBonus(t, i.damageTypeCall, e.main, e.sprite)
-                      : (t.didAbsorb = !0),
+                        ? this.createTrackedBonus(t, i.damageTypeCall, e.main, e.sprite)
+                        : (t.didAbsorb = !0),
                       (t.bonusAbsorb += 30),
                       this.hueActorWithMagic(t, 2),
                       a('Bonus Protection!'))
@@ -6209,7 +6231,7 @@ class RageOfMagicGame {
     });
     return (
       r &&
-      (i?.detached || (r.parent = e.parent),
+        (i?.detached || (r.parent = e.parent),
         (r.target = e.target),
         (r.speedX = i?.speedX ?? 0),
         (r.speedY = i?.speedY ?? 0),
@@ -6369,10 +6391,10 @@ class RageOfMagicGame {
       });
       a &&
         ((a.parent = i),
-          (a.spl = a.usedSpl = t),
-          (a.speedX = r * (5 + t)),
-          (a.speedY = (n - 1) * 3),
-          (a.speedJump = 2));
+        (a.spl = a.usedSpl = t),
+        (a.speedX = r * (5 + t)),
+        (a.speedY = (n - 1) * 3),
+        (a.speedJump = 2));
     }
   }
   processTriggers() {
@@ -6427,13 +6449,13 @@ class RageOfMagicGame {
             ? !this.hasActiveDialog()
             : e.command === 'script-trigger-sprites-done'
               ? !this.hasActiveDialog() &&
-              !this.caption &&
-              !this.mission &&
-              this.lines.size === 0 &&
-              this.statsTransitionFrames === 0 &&
-              this.goFrames === 0 &&
-              this.helpFrames === 0 &&
-              this.helpClosingFrames === 0
+                !this.caption &&
+                !this.mission &&
+                this.lines.size === 0 &&
+                this.statsTransitionFrames === 0 &&
+                this.goFrames === 0 &&
+                this.helpFrames === 0 &&
+                this.helpClosingFrames === 0
               : e.command === 'script-trigger-hue-done'
                 ? this.hue.done
                 : !1;
@@ -6555,9 +6577,9 @@ class RageOfMagicGame {
             : u?.kind === 'splash'
               ? this.startSplash()
               : u?.kind === 'nag-preview' &&
-              (this.manifest?.data.extra?.['Script:94']
-                ? (this.resetNewMode('show', 'preview'), this.loadScene('extra', 94))
-                : this.openMenu());
+                (this.manifest?.data.extra?.['Script:94']
+                  ? (this.resetNewMode('show', 'preview'), this.loadScene('extra', 94))
+                  : this.openMenu());
         return;
       }
       if (h === 'script-screen-call') {
@@ -6589,18 +6611,18 @@ class RageOfMagicGame {
         .findIndex((n) => n.number === i);
       (r >= 0 && (this.chapterIndex = r),
         this.dataName === 'arcade' &&
-        i > 0 &&
-        ((this.progress.arcadeChapter = i),
+          i > 0 &&
+          ((this.progress.arcadeChapter = i),
           (this.progress.arcadeMaxChapter = Math.max(this.progress.arcadeMaxChapter, i))),
         this.dataName === 'arena' &&
-        i > 0 &&
-        ((this.progress.arenaChapter = i),
+          i > 0 &&
+          ((this.progress.arenaChapter = i),
           (this.progress.arenaMaxChapter = Math.max(this.progress.arenaMaxChapter, i))));
     } else
       e === 'game-mode'
         ? ((this.sourceMode = normalizeMode(t[0])),
           ['arcade', 'arena', 'practice', 'show'].includes(this.sourceMode) &&
-          (this.mode = this.sourceMode))
+            (this.mode = this.sourceMode))
         : e === 'game-audio-play'
           ? this.playSound(t[0])
           : e === 'game-music-set'
@@ -6780,10 +6802,10 @@ class RageOfMagicGame {
       const i = this.actor(t[0]);
       i &&
         ((i.face = toNumber(t[1], 1)),
-          (i.x = toNumber(t[2])),
-          (i.y = toNumber(t[3])),
-          (i.jump = toNumber(t[4])),
-          (i.speedX = i.speedY = i.speedJump = 0));
+        (i.x = toNumber(t[2])),
+        (i.y = toNumber(t[3])),
+        (i.jump = toNumber(t[4])),
+        (i.speedX = i.speedY = i.speedJump = 0));
     } else if (e === 'scene-actor-set-action') {
       const i = this.actor(t[0]);
       i && this.queueActorAction(i, toNumber(t[1]));
@@ -6825,8 +6847,8 @@ class RageOfMagicGame {
       const i = this.actor(t[0]);
       i &&
         (t[1] !== '?' && (i.hp = toNumber(t[1])),
-          t[2] !== '?' && (i.mp = toNumber(t[2])),
-          t[3] !== '?' && (i.spl = toNumber(t[3])));
+        t[2] !== '?' && (i.mp = toNumber(t[2])),
+        t[3] !== '?' && (i.spl = toNumber(t[3])));
     } else if (e === 'scene-actor-set-stat-restore') {
       const i = this.actor(t[0]);
       i && ((i.hp = i.totalHp), (i.mp = i.totalMp), (i.spl = 0));
@@ -6837,8 +6859,8 @@ class RageOfMagicGame {
       const i = this.actor(t[0]);
       i &&
         (t[1] !== '?' && (i.hp += toNumber(t[1])),
-          t[2] !== '?' && (i.mp += toNumber(t[2])),
-          t[3] !== '?' && (i.spl += toNumber(t[3])));
+        t[2] !== '?' && (i.mp += toNumber(t[2])),
+        t[3] !== '?' && (i.spl += toNumber(t[3])));
     } else if (e === 'scene-actor-add-level') {
       const i = this.actor(t[0]);
       i && i.recalculateStats(i.level + toNumber(t[1]));
@@ -6935,10 +6957,10 @@ class RageOfMagicGame {
       : !h && i === 1 && this.sourceMode !== 'arena'
         ? ((d = Math.trunc(this.cameraX) + SCREEN_WIDTH - 150), (u = -1))
         : !h &&
-        i === 1 &&
-        (f = Math.trunc(
-          this.selectedPlayerState(1)?.didJoin ? this.floorHeight * 0.2 : this.floorHeight / 2,
-        ));
+          i === 1 &&
+          (f = Math.trunc(
+            this.selectedPlayerState(1)?.didJoin ? this.floorHeight * 0.2 : this.floorHeight / 2,
+          ));
     const m = this.addActor({
       id: `p${i + 1}`,
       main: o,
@@ -7173,14 +7195,14 @@ class RageOfMagicGame {
             ? ((r -= 40 * i.face), (n += 30))
             : a === 'b2' && ((r -= 80 * i.face), (n += 50));
     const o = e.endsWith('cleric')
-      ? 'cleric'
-      : e.endsWith('actor')
-        ? 'actor'
-        : e.endsWith('fairy')
-          ? 'none'
-          : e.endsWith('boss')
-            ? 'boss'
-            : 'fighter',
+        ? 'cleric'
+        : e.endsWith('actor')
+          ? 'actor'
+          : e.endsWith('fairy')
+            ? 'none'
+            : e.endsWith('boss')
+              ? 'boss'
+              : 'fighter',
       l = e.endsWith('cleric')
         ? 'cleric'
         : e.endsWith('fairy')
@@ -7233,8 +7255,8 @@ class RageOfMagicGame {
   }
   removeActorBonuses(e) {
     const t = [...this.actors, ...this.pendingActors].filter(
-      (r) => r !== e && !r.removed && r.leader === e && r.controllerKind === 'circle',
-    ),
+        (r) => r !== e && !r.removed && r.leader === e && r.controllerKind === 'circle',
+      ),
       i = e.bonusRage > 0 || e.bonusRefract > 0 || e.bonusAbsorb > 0 || t.length > 0;
     e.bonusRage = e.bonusRefract = e.bonusAbsorb = 0;
     for (const r of t) r.hp = 0;
@@ -7263,7 +7285,7 @@ class RageOfMagicGame {
     });
     return (
       n &&
-      ((n.leader = e),
+        ((n.leader = e),
         (n.parent = e),
         this.circleProcessors.set(n, newFollowMemory(n)),
         circleSiblings(e, [...this.actors, ...this.pendingActors])),
@@ -7290,7 +7312,7 @@ class RageOfMagicGame {
     });
     return (
       n &&
-      ((n.leader = e),
+        ((n.leader = e),
         (n.parent = e),
         this.trackProcessors.set(n, newFairyMemory(this.trackBonusType(n)))),
       n
@@ -7310,7 +7332,7 @@ class RageOfMagicGame {
       this.pendingActors.push(i),
       i.process === 'script' && this.scriptProcessorBumps.add(i),
       e.role === 'player' &&
-      (this.markerFrames.set(i, this.sourceGameRate() * TIMING.markerSeconds),
+        (this.markerFrames.set(i, this.sourceGameRate() * TIMING.markerSeconds),
         e.id === 'p1' && (this.player = i),
         (e.id === 'p1' || e.id === 'p2') && this.sourcePlayerActors.set(e.id === 'p2' ? 2 : 1, i)),
       i
@@ -7349,18 +7371,18 @@ class RageOfMagicGame {
   setActorProcess(e, t) {
     if (
       ((e.processType = t),
-        (e.process = controllerKindOf(e, t)),
-        (e.script = void 0),
-        (e.aiWait = 0),
-        this.scriptProcessorBumps.delete(e),
-        e.process === 'script' && this.scriptProcessorBumps.add(e),
-        t === 'script' && this.markerFrames.delete(e),
-        this.fighterControllers.delete(e),
-        this.animalProcessors.delete(e),
-        this.clericProcessors.delete(e),
-        this.fairyProcessors.delete(e),
-        this.wispProcessors.delete(e),
-        t === 'ai' && e.controllerKind === 'player')
+      (e.process = controllerKindOf(e, t)),
+      (e.script = void 0),
+      (e.aiWait = 0),
+      this.scriptProcessorBumps.delete(e),
+      e.process === 'script' && this.scriptProcessorBumps.add(e),
+      t === 'script' && this.markerFrames.delete(e),
+      this.fighterControllers.delete(e),
+      this.animalProcessors.delete(e),
+      this.clericProcessors.delete(e),
+      this.fairyProcessors.delete(e),
+      this.wispProcessors.delete(e),
+      t === 'ai' && e.controllerKind === 'player')
     ) {
       const i = this.playerInputStates.get(e);
       i && ((i.queue = [0, 0, 0, 0]), (i.didDouble = !1));
@@ -7521,9 +7543,9 @@ class RageOfMagicGame {
   openHelpKeys() {
     this.helpFrames > 0 ||
       ((this.helpHintShown = !0),
-        (this.helpTotalFrames = this.sourceGameRate() * 30 + 21),
-        (this.helpFrames = this.helpTotalFrames),
-        (this.helpClosingFrames = 0));
+      (this.helpTotalFrames = this.sourceGameRate() * 30 + 21),
+      (this.helpFrames = this.helpTotalFrames),
+      (this.helpClosingFrames = 0));
   }
   closeHelpKeys() {
     this.helpFrames > 0 && (this.helpClosingFrames = 11);
@@ -7531,9 +7553,9 @@ class RageOfMagicGame {
   startStatsTransition(e, t) {
     e !== this.statsVisible &&
       ((this.statsVisible = e),
-        (this.statsTransitionOpening = e),
-        (this.statsTransitionTotal = Math.max(0, Math.trunc(t)) + 11),
-        (this.statsTransitionFrames = this.statsTransitionTotal));
+      (this.statsTransitionOpening = e),
+      (this.statsTransitionTotal = Math.max(0, Math.trunc(t)) + 11),
+      (this.statsTransitionFrames = this.statsTransitionTotal));
   }
   statsHudOffset() {
     if (this.statsTransitionFrames <= 0) return this.statsVisible ? 0 : void 0;
@@ -7556,8 +7578,8 @@ class RageOfMagicGame {
     const t = e === 'caption' ? this.caption : this.mission;
     t &&
       (t.closingFrames !== void 0 ? (t.closingFrames -= 1) : (t.frames -= 1),
-        ((t.closingFrames !== void 0 && t.closingFrames <= 0) ||
-          (t.closingFrames === void 0 && t.frames <= 0)) &&
+      ((t.closingFrames !== void 0 && t.closingFrames <= 0) ||
+        (t.closingFrames === void 0 && t.frames <= 0)) &&
         (e === 'caption' ? (this.caption = void 0) : (this.mission = void 0)));
   }
   stepMessages() {
@@ -7566,7 +7588,7 @@ class RageOfMagicGame {
       (t.closingFrames !== void 0 ? (t.closingFrames -= 1) : (t.frames -= 1),
         ((t.closingFrames !== void 0 && t.closingFrames <= 0) ||
           (t.closingFrames === void 0 && t.frames <= 0)) &&
-        this.lines.delete(e));
+          this.lines.delete(e));
     for (const [e, t] of this.dialogs) {
       const i = this.dialogCloseFrames.get(e);
       if (i !== void 0) {
@@ -7583,21 +7605,21 @@ class RageOfMagicGame {
         if (r.phase === 'swap-exit')
           ((r.delay -= 1),
             r.delay <= 0 &&
-            ((r.displayActor = r.actor),
+              ((r.displayActor = r.actor),
               (r.phase = 'enter'),
               (r.delay = PANEL_ENTER_FRAMES),
               this.playSound('streak')));
         else if (r.phase === 'enter')
           ((r.delay -= 1),
             r.delay <= 0 &&
-            ((r.phase = r.text ? 'printing' : 'delay'), (r.delay = r.text ? 0 : 10)));
+              ((r.phase = r.text ? 'printing' : 'delay'), (r.delay = r.text ? 0 : 10)));
         else if (r.phase === 'printing')
           ((r.tick += 1),
             r.tick > [6, 3, 1][this.typeSpeedIndex] &&
-            ((r.tick = 0),
+              ((r.tick = 0),
               (r.reveal += 1),
               r.reveal > r.text.length &&
-              ((r.reveal = r.text.length), (r.phase = 'waiting'), this.playSound('blip'))));
+                ((r.reveal = r.text.length), (r.phase = 'waiting'), this.playSound('blip'))));
         else if (r.phase === 'delay' && --r.delay <= 0) {
           const n = t.shift();
           n && this.dialogTexts.set(e, n.text);
@@ -7620,7 +7642,7 @@ class RageOfMagicGame {
         (t.phase === 'printing'
           ? ((t.reveal = t.text.length), (t.phase = 'waiting'))
           : t.phase === 'waiting' &&
-          ((t.phase = 'delay'), (t.delay = 10), this.playSound('click')));
+            ((t.phase = 'delay'), (t.delay = 10), this.playSound('click')));
     }
     this.renderDialog();
   }
@@ -7744,40 +7766,40 @@ class RageOfMagicGame {
       return i === void 0
         ? []
         : [
-          {
-            selectId: i,
-          },
-        ];
+            {
+              selectId: i,
+            },
+          ];
     });
   }
   sourceEndPlayerSnapshot(e, t = 0) {
     const i =
-      e === 'arcade'
-        ? this.progress.arcadePlayer
-        : t === 0
-          ? this.progress.arenaPlayer
-          : normalizePlayerProgress(this.progress.arenaPlayer2, 1),
+        e === 'arcade'
+          ? this.progress.arcadePlayer
+          : t === 0
+            ? this.progress.arenaPlayer
+            : normalizePlayerProgress(this.progress.arenaPlayer2, 1),
       r = this.selectedPlayerState(t + 1),
       n = r
         ? normalizePlayerProgress(
-          {
-            ...i,
-            ...r,
-            selectList: r.selectList,
-          },
-          t,
-        )
+            {
+              ...i,
+              ...r,
+              selectList: r.selectList,
+            },
+            t,
+          )
         : i,
       a = this.sourcePlayerActors.get(t + 1) ?? this.actors.find((l) => l.id === `p${t + 1}`),
       o =
         e === 'arena'
           ? [...this.sourceAllyTypes.entries()]
-            .filter(([l]) => l.id.startsWith(`p${t}a`))
-            .map(([l, c]) => ({
-              hp: l.hp,
-              allyType: c,
-              items: this.sourceEndItems(l),
-            }))
+              .filter(([l]) => l.id.startsWith(`p${t}a`))
+              .map(([l, c]) => ({
+                hp: l.hp,
+                allyType: c,
+                items: this.sourceEndItems(l),
+              }))
           : [];
     return {
       ...normalizePlayerProgress(n, this.heroIndex),
@@ -7786,25 +7808,25 @@ class RageOfMagicGame {
       color: r?.color ?? n.color,
       actor: a
         ? {
-          hp: a.hp,
-          totalHp: a.totalHp,
-          level: a.level,
-          score: a.score,
-          kills: a
-            ? (this.playerKillCounts.get(a) ??
-              (this.playerLineIndex(a) === 0 ? this.playerKills : 0))
-            : 0,
-          statTime: this.timer,
-          spl: a.spl,
-          bonusRage: a.bonusRage,
-          bonusRefract: a.bonusRefract,
-          bonusAbsorb: a.bonusAbsorb,
-          bonusLife: a.bonusLife,
-          circleCount: this.actors.filter(
-            (l) => !l.removed && l.leader === a && l.controllerKind === 'circle',
-          ).length,
-          items: this.sourceEndItems(a),
-        }
+            hp: a.hp,
+            totalHp: a.totalHp,
+            level: a.level,
+            score: a.score,
+            kills: a
+              ? (this.playerKillCounts.get(a) ??
+                (this.playerLineIndex(a) === 0 ? this.playerKills : 0))
+              : 0,
+            statTime: this.timer,
+            spl: a.spl,
+            bonusRage: a.bonusRage,
+            bonusRefract: a.bonusRefract,
+            bonusAbsorb: a.bonusAbsorb,
+            bonusLife: a.bonusLife,
+            circleCount: this.actors.filter(
+              (l) => !l.removed && l.leader === a && l.controllerKind === 'circle',
+            ).length,
+            items: this.sourceEndItems(a),
+          }
         : null,
       createdAllies: o,
     };
@@ -7827,54 +7849,54 @@ class RageOfMagicGame {
     this.endResult =
       e === 'arcade'
         ? nextArcadeStage({
-          gameChapter: i.chapter,
-          gameMaxChapter: i.maxChapter,
-          gameReplay: r,
-          gameHiscore: this.progress.arcadeWon ? 1 : 0,
-          gameStatus: t ? 1 : this.statusValue,
-          players: [n],
-          chapterScripts: i.scripts,
-        })
+            gameChapter: i.chapter,
+            gameMaxChapter: i.maxChapter,
+            gameReplay: r,
+            gameHiscore: this.progress.arcadeWon ? 1 : 0,
+            gameStatus: t ? 1 : this.statusValue,
+            players: [n],
+            chapterScripts: i.scripts,
+          })
         : buildStageResult({
-          gameChapter: i.chapter,
-          gameMaxChapter: i.maxChapter,
-          gameReplay: r,
-          gameHiscore: this.progress.arenaWon ? 1 : 0,
-          players: [n, this.sourceEndPlayerSnapshot(e, 1)],
-          chapterScripts: i.scripts,
-        });
+            gameChapter: i.chapter,
+            gameMaxChapter: i.maxChapter,
+            gameReplay: r,
+            gameHiscore: this.progress.arenaWon ? 1 : 0,
+            players: [n, this.sourceEndPlayerSnapshot(e, 1)],
+            chapterScripts: i.scripts,
+          });
     const a = this.endResult;
     (r ||
       (this.storeSourceEndPlayer(e, a.players[0]),
-        e === 'arena' && this.storeSourceEndPlayer(e, a.players[1], 1)),
+      e === 'arena' && this.storeSourceEndPlayer(e, a.players[1], 1)),
       e === 'arena' &&
-      (this.selectedPlayers = [0, 1].map((o) => {
-        const l = a.players[o],
-          c =
-            this.selectedPlayers[o] ??
-            newSelectPlayer(o, {
-              didJoin: o === 0,
-              character: l?.character ?? o,
-              controller: o,
-            });
-        return l
-          ? {
-            ...c,
-            didJoin: l.didJoin,
-            character: l.character,
-            color: l.color,
-            score: l.score,
-            coins: l.coins,
-            selectList: [...l.selectList],
-          }
-          : c;
-      })),
+        (this.selectedPlayers = [0, 1].map((o) => {
+          const l = a.players[o],
+            c =
+              this.selectedPlayers[o] ??
+              newSelectPlayer(o, {
+                didJoin: o === 0,
+                character: l?.character ?? o,
+                controller: o,
+              });
+          return l
+            ? {
+                ...c,
+                didJoin: l.didJoin,
+                character: l.character,
+                color: l.color,
+                score: l.score,
+                coins: l.coins,
+                selectList: [...l.selectList],
+              }
+            : c;
+        })),
       r ||
-      (e === 'arcade'
-        ? ((this.progress.arcadeChapter = a.gameChapter),
-          (this.progress.arcadeMaxChapter = a.gameMaxChapter))
-        : ((this.progress.arenaChapter = a.gameChapter),
-          (this.progress.arenaMaxChapter = a.gameMaxChapter))),
+        (e === 'arcade'
+          ? ((this.progress.arcadeChapter = a.gameChapter),
+            (this.progress.arcadeMaxChapter = a.gameMaxChapter))
+          : ((this.progress.arenaChapter = a.gameChapter),
+            (this.progress.arenaMaxChapter = a.gameMaxChapter))),
       (this.score = a.players[0]?.score ?? this.score),
       this.saveHighScore(),
       (this.endChoice = 0),
@@ -7930,8 +7952,8 @@ class RageOfMagicGame {
         const i = stepQuestion(this.endQuestionState, t);
         if (
           ((this.endQuestionState = i.state),
-            'sound' in i && i.sound && this.playSound(i.sound),
-            i.kind === 'choose')
+          'sound' in i && i.sound && this.playSound(i.sound),
+          i.kind === 'choose')
         ) {
           const r = i.choice === 0 ? this.endQuestion.yesCommand : this.endQuestion.noCommand;
           (this.closeEndModal(),
@@ -7948,12 +7970,12 @@ class RageOfMagicGame {
         } else
           GAME_KEYS.has(e) &&
             (this.playSound(RESULT_SCREEN.acceptAudio),
-              this.clearAllSourceInputs(),
-              this.applySourceEndEffects(
-                resultChoiceEffects(this.endResult, this.endChoice, {
-                  localLowest: lowestHighScore(this.localScores, this.endResult.mode),
-                }),
-              ));
+            this.clearAllSourceInputs(),
+            this.applySourceEndEffects(
+              resultChoiceEffects(this.endResult, this.endChoice, {
+                localLowest: lowestHighScore(this.localScores, this.endResult.mode),
+              }),
+            ));
     }
   }
   applySourceEndEffects(e) {
@@ -7972,16 +7994,16 @@ class RageOfMagicGame {
   beginEndRouteFade(e) {
     this.endRouteFade ||
       (this.clearAllSourceInputs(),
-        (this.endRouteFade = {
-          step: 0,
-          route: e,
-          filter:
-            typeof document > 'u'
-              ? void 0
-              : new ColorMatrixFilter({
+      (this.endRouteFade = {
+        step: 0,
+        route: e,
+        filter:
+          typeof document > 'u'
+            ? void 0
+            : new ColorMatrixFilter({
                 padding: 0,
               }),
-        }));
+      }));
   }
   stepEndRouteFade() {
     const e = this.endRouteFade;
@@ -8145,11 +8167,11 @@ class RageOfMagicGame {
       c.ready && this.startInterstitialAudio(c),
       this.renderInterstitial(),
       l &&
-      !this.images.has(l) &&
-      this.ensureImage(l).then(() => {
-        this.interstitial === c &&
-          (this.startInterstitialAudio(c), (c.ready = !0), this.renderInterstitial());
-      }));
+        !this.images.has(l) &&
+        this.ensureImage(l).then(() => {
+          this.interstitial === c &&
+            (this.startInterstitialAudio(c), (c.ready = !0), this.renderInterstitial());
+        }));
   }
   openPoster(e, t, i = this.suspendedScript ? 'script' : 'none', r = !1) {
     this.clearAllSourceInputs();
@@ -8177,25 +8199,25 @@ class RageOfMagicGame {
       u.ready && this.startInterstitialAudio(u),
       this.renderInterstitial(),
       u.ready ||
-      this.ensureImage(a)
-        .then(() => {
-          this.interstitial === u &&
-            (this.startInterstitialAudio(u), (u.ready = !0), this.renderInterstitial());
-        })
-        .catch((d) => {
-          this.interstitial === u &&
-            (u.targetError = d instanceof Error ? d : new Error(String(d)));
-        }),
+        this.ensureImage(a)
+          .then(() => {
+            this.interstitial === u &&
+              (this.startInterstitialAudio(u), (u.ready = !0), this.renderInterstitial());
+          })
+          .catch((d) => {
+            this.interstitial === u &&
+              (u.targetError = d instanceof Error ? d : new Error(String(d)));
+          }),
       c &&
-      !h &&
-      this.prepareScene(c)
-        .then((d) => {
-          this.interstitial === u && ((u.preparedTarget = d), (u.targetReady = !0));
-        })
-        .catch((d) => {
-          this.interstitial === u &&
-            (u.targetError = d instanceof Error ? d : new Error(String(d)));
-        }));
+        !h &&
+        this.prepareScene(c)
+          .then((d) => {
+            this.interstitial === u && ((u.preparedTarget = d), (u.targetReady = !0));
+          })
+          .catch((d) => {
+            this.interstitial === u &&
+              (u.targetError = d instanceof Error ? d : new Error(String(d)));
+          }));
   }
   stepInterstitial() {
     const e = this.interstitial;
@@ -8208,7 +8230,7 @@ class RageOfMagicGame {
               e.returnTo !== 'script' &&
               e.returnTo !== 'none' &&
               this.finalizeInterstitialAudio(e),
-              e.closingStep > (e.closingHueSteps ?? 20))
+            e.closingStep > (e.closingHueSteps ?? 20))
           ) {
             this.finishInterstitial();
             return;
@@ -8243,10 +8265,10 @@ class RageOfMagicGame {
           return;
         (t.returnTo === 'attract-demo' &&
           ((this.introLoop = 0),
-            (this.pendingAttractDemoScript = void 0),
-            (t.returnTo = 'splash'),
-            (t.closingHueTarget = 255),
-            (t.closingHueSteps = 10)),
+          (this.pendingAttractDemoScript = void 0),
+          (t.returnTo = 'splash'),
+          (t.closingHueTarget = 255),
+          (t.closingHueSteps = 10)),
           this.closeInterstitial());
         return;
       }
@@ -8285,16 +8307,16 @@ class RageOfMagicGame {
     const t = new Container();
     if (
       (t.addChild(new Graphics().rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT).fill(0)),
-        (e.display = t),
-        (e.textDisplay = void 0),
-        (e.arrowDisplay = void 0),
-        (e.fadeFilter =
-          typeof document > 'u'
-            ? void 0
-            : new ColorMatrixFilter({
+      (e.display = t),
+      (e.textDisplay = void 0),
+      (e.arrowDisplay = void 0),
+      (e.fadeFilter =
+        typeof document > 'u'
+          ? void 0
+          : new ColorMatrixFilter({
               padding: 0,
             })),
-        !e.ready)
+      !e.ready)
     ) {
       this.overlayLayer.addChild(t);
       return;
@@ -8365,13 +8387,13 @@ class RageOfMagicGame {
     const t = e.motion;
     e.textDisplay &&
       ((e.textDisplay.alpha = t.textPct),
-        (e.textDisplay.y = e.kind === 'novel' ? Math.trunc(e.motion.y) : 0));
+      (e.textDisplay.y = e.kind === 'novel' ? Math.trunc(e.motion.y) : 0));
     const i = Math.max(1, e.closingHueSteps ?? 20),
       r = e.closingHueTarget ?? -255,
       n = e.closingStep === void 0 ? t.hue : (r * Math.min(i, e.closingStep)) / i;
     if (
       (e.fadeFilter && this.setDisplayAdditiveHue(e.display, e.fadeFilter, n),
-        e.kind === 'novel' && e.arrowDisplay)
+      e.kind === 'novel' && e.arrowDisplay)
     ) {
       e.arrowDisplay.visible = e.motion.manual;
       const a = Math.floor(e.motion.anim / 10) & 1,
@@ -8432,13 +8454,13 @@ class RageOfMagicGame {
   finalizeInterstitialAudio(e) {
     e.audioFinalized ||
       ((e.audioFinalized = !0),
-        e.sectionMusic && this.audio.stop(e.sectionMusic, !0),
-        e.kind === 'novel'
-          ? this.restoreMusicSnapshot({
+      e.sectionMusic && this.audio.stop(e.sectionMusic, !0),
+      e.kind === 'novel'
+        ? this.restoreMusicSnapshot({
             name: e.previousMusic,
             playing: e.previousMusicPlaying,
           })
-          : this.selectCurrentMusic(void 0, !1));
+        : this.selectCurrentMusic(void 0, !1));
   }
   startInterstitialAudio(e) {
     if (!e.audioStarted) {
@@ -8537,8 +8559,8 @@ class RageOfMagicGame {
             if (
               (w ||
                 ((w = spriteTexture(v, f.entry.bounds[g], f.entry.width, f.entry.height)),
-                  this.sourceTextureCache.set(S, w)),
-                w)
+                this.sourceTextureCache.set(S, w)),
+              w)
             ) {
               (ensureOpacityFilter(c), this.ensureShadowSceneCompositeFilter());
               const A = new Sprite(w);
@@ -8548,16 +8570,16 @@ class RageOfMagicGame {
                 (A.scale.y = _.scaleY),
                 c.container.addChild(A));
               const E = f.entry.bounds[g] ?? {
-                x1: 0,
-                y1: 0,
-                x2: f.entry.width - 1,
-                y2: f.entry.height - 1,
-              },
+                  x1: 0,
+                  y1: 0,
+                  x2: f.entry.width - 1,
+                  y2: f.entry.height - 1,
+                },
                 D = `shadow-clipped:${d}:${g}`;
               let B = this.sourceTextureCache.get(D);
               (B ||
                 ((B = shadowTexture(v, f.entry.bounds[g], f.entry.width, f.entry.height)),
-                  B && this.sourceTextureCache.set(D, B)),
+                B && this.sourceTextureCache.set(D, B)),
                 u.push({
                   sprite: A,
                   commonTexture: w,
@@ -8600,22 +8622,22 @@ class RageOfMagicGame {
       let h = !1;
       for (const u of this.actorShadowLayerDisplays.get(e) ?? []) {
         const m =
-          Math.trunc(Math.trunc(-this.cameraX) + e.x) +
-          e.quakeOffsetX +
-          u.layerX * e.face -
-          (e.face === 1 ? SHADOW_ORIGIN_X - u.cropX1 : u.cropX2 - SHADOW_ORIGIN_X),
+            Math.trunc(Math.trunc(-this.cameraX) + e.x) +
+            e.quakeOffsetX +
+            u.layerX * e.face -
+            (e.face === 1 ? SHADOW_ORIGIN_X - u.cropX1 : u.cropX2 - SHADOW_ORIGIN_X),
           p = Math.trunc(
             Math.trunc(this.cameraY) +
-            SCREEN_HEIGHT -
-            SCENE_HEIGHT +
-            this.floorTop +
-            e.y +
-            Math.trunc(u.layerY / 4),
+              SCREEN_HEIGHT -
+              SCENE_HEIGHT +
+              this.floorTop +
+              e.y +
+              Math.trunc(u.layerY / 4),
           ),
           g = isFrameClipped(m, p, u.sourceWidth, u.sourceHeight, SCREEN_WIDTH, SCREEN_HEIGHT);
         ((u.sprite.visible = !g || !!u.clippedTexture),
           u.sprite.visible &&
-          ((u.sprite.texture = g ? u.clippedTexture : u.commonTexture), (h = !0)));
+            ((u.sprite.texture = g ? u.clippedTexture : u.commonTexture), (h = !0)));
       }
       l.container.visible = !this.superActor && c > 0 && h;
     }
@@ -8639,11 +8661,11 @@ class RageOfMagicGame {
       (a.type === 1
         ? ({ r: o, g: l, b: c } = i)
         : a.type === 0 &&
-        (e.drawType === 1 && ((o = e.hueR), (l = e.hueG), (c = e.hueB)),
+          (e.drawType === 1 && ((o = e.hueR), (l = e.hueG), (c = e.hueB)),
           r &&
-          (n
-            ? ((o += 50), (l -= 20), (c -= 10))
-            : ((o += e.drawType === 1 && a.sprite.alpha < 1 ? 25 : 20), (l -= 10), (c -= 5)))),
+            (n
+              ? ((o += 50), (l -= 20), (c -= 10))
+              : ((o += e.drawType === 1 && a.sprite.alpha < 1 ? 25 : 20), (l -= 10), (c -= 5)))),
         this.setLayerAdditiveHue(a, o, l, c));
     }
   }
@@ -8737,9 +8759,10 @@ class RageOfMagicGame {
       this.drawSourceStat(i, r, 3 + e, !0);
       const n = i.whoIHit && !i.whoIHit.removed ? i.whoIHit : void 0;
       n && this.drawSourceStat(n, r, 35 + e, !1);
-    } else this.drawEmptyPlayerStat(1, r, 3 + e);
+    } else this.sourceMode !== 'survival' && this.drawEmptyPlayerStat(1, r, 3 + e);
     ((t || i) && this.drawSourceTimer(3, 3 + e),
-      this.sourceMode === 'survival' && this.drawSurvivalStatus(35 + e));
+      // With no second player there, the wave and clock take that corner.
+      this.sourceMode === 'survival' && this.drawSurvivalStatus(3 + e));
   }
   drawHudPrompt(e, t, i, r) {
     const n = this.sourceBitmapText(0, e);
@@ -8830,19 +8853,19 @@ class RageOfMagicGame {
         color: 0,
         alpha: 0.5,
       }),
-        h < 205 &&
+      h < 205 &&
         d.rect(t + 26 + h, i + 14, 205 - h, 5).fill({
           color: 0,
           alpha: 0.5,
         }),
-        e.totalMp > 0 &&
+      e.totalMp > 0 &&
         u < 187 &&
         d.rect(t + 26 + u, i + 20, 187 - u, 5).fill({
           color: 0,
           alpha: 0.5,
         }),
-        c.addChild(d),
-        l)
+      c.addChild(d),
+      l)
     ) {
       const v = new Sprite(l);
       (v.position.set(t - 1, i - 2), c.addChild(v));
@@ -8891,8 +8914,8 @@ class RageOfMagicGame {
     }
     if (
       (this.drawEmbossBar(c, t + 26, i + 14, h, [16776960, 16762368, 11700736]),
-        e.totalMp > 0 && this.drawEmbossBar(c, t + 26, i + 20, u, [314879, 37119, 25778]),
-        n > 0)
+      e.totalMp > 0 && this.drawEmbossBar(c, t + 26, i + 20, u, [314879, 37119, 25778]),
+      n > 0)
     ) {
       const v = Math.min(n, Math.max(0, Math.trunc(e.spl)));
       for (let x = 0; x < v; x += 1)
@@ -8947,7 +8970,7 @@ class RageOfMagicGame {
         l < 15
           ? (d = -a + (SCREEN_WIDTH / 2 + a) * h(l))
           : l >= 15 + c &&
-          (d = SCREEN_WIDTH / 2 + (SCREEN_WIDTH + a - SCREEN_WIDTH / 2) * u(l - 15 - c));
+            (d = SCREEN_WIDTH / 2 + (SCREEN_WIDTH + a - SCREEN_WIDTH / 2) * u(l - 15 - c));
       const m = (this.manifest?.bitmapFonts[i ? 0 : 2]?.height ?? (i ? 10 : 25)) + 10,
         p = t.y - 3,
         g = l;
@@ -9001,7 +9024,7 @@ class RageOfMagicGame {
             alpha: 0.5,
           }),
         ),
-          c)
+        c)
       ) {
         const x = this.atlases.get(c.sprite),
           b = x ? this.sourceCroppedTexture(c.sprite, Math.max(0, x.entry.frames - 1)) : void 0;
@@ -9065,7 +9088,7 @@ class RageOfMagicGame {
           (t <= TIMING.goDelayFrames
             ? 0
             : Math.floor((t - TIMING.goDelayFrames) * TIMING.goAnimationSpeed) %
-            TIMING.goAnimationFrameCount) === 0
+              TIMING.goAnimationFrameCount) === 0
             ? 0
             : 1,
         n = atlasCellPosition(r, 2, 63, 52),
@@ -9087,14 +9110,14 @@ class RageOfMagicGame {
         Math.round(t.x - this.cameraX - 11),
         Math.round(
           this.cameraY +
-          SCREEN_HEIGHT -
-          SCENE_HEIGHT +
-          this.floorTop +
-          t.y -
-          31 -
-          t.jump -
-          (t.type.solid[2] ?? 40) -
-          12,
+            SCREEN_HEIGHT -
+            SCENE_HEIGHT +
+            this.floorTop +
+            t.y -
+            31 -
+            t.jump -
+            (t.type.solid[2] ?? 40) -
+            12,
         ),
       ),
         this.dialogLayer.addChild(o));
@@ -9118,14 +9141,14 @@ class RageOfMagicGame {
     const r = Math.round(e.x - this.cameraX - 15),
       n = Math.round(
         this.cameraY +
-        SCREEN_HEIGHT -
-        SCENE_HEIGHT +
-        this.floorTop +
-        e.y -
-        2 -
-        e.jump -
-        (e.type.solid[2] ?? 40) -
-        12,
+          SCREEN_HEIGHT -
+          SCENE_HEIGHT +
+          this.floorTop +
+          e.y -
+          2 -
+          e.jump -
+          (e.type.solid[2] ?? 40) -
+          12,
       ),
       a = e.totalHp > 0 ? Math.max(e.hp > 0 ? 1 : 0, Math.trunc((27 * e.hp) / e.totalHp)) : 0,
       o = [16777215, 5263614, 16728128, 13172544, 4259648, 16744512, 6605e3, 13133e3, 12632256],
@@ -9237,7 +9260,7 @@ class RageOfMagicGame {
         }),
       ),
       e ||
-      (this.hudLayer.removeChildren().forEach((i) => i.destroy()),
+        (this.hudLayer.removeChildren().forEach((i) => i.destroy()),
         this.dialogLayer.removeChildren().forEach((i) => i.destroy()),
         this.fadeLayer.removeChildren().forEach((i) => i.destroy())),
       this.overlayLayer.removeChildren().forEach((i) => i.destroy()));
@@ -9250,9 +9273,9 @@ class RageOfMagicGame {
       (e
         ? this.renderSourceEndScreen()
         : this.screenLayer.addChild(
-          new Graphics().rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT).fill(t ? 0 : 133396),
-        ),
-        !e)
+            new Graphics().rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT).fill(t ? 0 : 133396),
+          ),
+      !e)
     )
       if (this.screen === 'loading') {
         const i = editionInfo(this.edition === 'full'),
@@ -9292,16 +9315,16 @@ class RageOfMagicGame {
                           ? this.renderScoreFlow()
                           : this.screen === 'clear'
                             ? this.renderMessage(
-                              'Stage Clear',
-                              `Score ${this.score.toLocaleString()}
+                                'Stage Clear',
+                                `Score ${this.score.toLocaleString()}
 Press Enter to return`,
-                            )
+                              )
                             : this.screen === 'defeated' &&
-                            this.renderMessage(
-                              'Defeated',
-                              `Final score ${this.score.toLocaleString()}
+                              this.renderMessage(
+                                'Defeated',
+                                `Final score ${this.score.toLocaleString()}
 Press Enter to return`,
-                            );
+                              );
   }
   renderPlayQuestion() {
     const e = this.playQuestion;
@@ -9508,7 +9531,7 @@ Press Enter to return`,
     (this.addSourceBitmap(this.overlayLayer, 3, i.title, SCREEN_WIDTH / 2, 112, !0),
       this.addSourceBitmap(this.overlayLayer, 2, i.message, SCREEN_WIDTH / 2, 165, !0),
       i.kind === 'question' &&
-      (this.addSourceBitmap(this.overlayLayer, i.choice === 0 ? 3 : 2, 'Yes', 205, 235, !0),
+        (this.addSourceBitmap(this.overlayLayer, i.choice === 0 ? 3 : 2, 'Yes', 205, 235, !0),
         this.addSourceBitmap(this.overlayLayer, i.choice === 1 ? 3 : 2, 'No', 307, 235, !0)));
   }
   renderScoreFlow() {
@@ -9531,14 +9554,14 @@ Press Enter to return`,
       e,
     ),
       this.screen === 'input' &&
-      this.hiscoreInput &&
-      this.renderSourceContract(
-        drawNameEntryScreen({
-          state: this.hiscoreInput,
-          drawFrame: this.submitFrame,
-        }),
-        e,
-      ),
+        this.hiscoreInput &&
+        this.renderSourceContract(
+          drawNameEntryScreen({
+            state: this.hiscoreInput,
+            drawFrame: this.submitFrame,
+          }),
+          e,
+        ),
       this.screenLayer.addChild(e),
       this.overlayLayer.removeChildren().forEach((t) =>
         t.destroy({
@@ -9556,7 +9579,7 @@ Press Enter to return`,
           alpha: 0.25,
         }),
       ),
-        e.kind === 'question')
+      e.kind === 'question')
     ) {
       const i = e.route,
         r = this.sourceCroppedTexture('ui.guiform', QUESTION_LAYOUT.form),
@@ -9671,8 +9694,8 @@ Press Enter to return`,
         typeof document > 'u'
           ? void 0
           : new ColorMatrixFilter({
-            padding: 0,
-          })),
+              padding: 0,
+            })),
       this.screenLayer.addChild(e));
     const i = SCREEN_HEIGHT - 13,
       r = new Container();
@@ -9728,7 +9751,7 @@ Press Enter to return`,
         const o = this.addSourceActorIcon(t, a.actorId, a.frame ?? 0, a.size, a.x, a.y);
         o &&
           ((a.treatment === 'fade' || a.treatment === 'fade-solid') && (o.alpha = 0.5),
-            (a.treatment === 'solid' || a.treatment === 'fade-solid') &&
+          (a.treatment === 'solid' || a.treatment === 'fade-solid') &&
             a.solidColor !== void 0 &&
             (o.tint = a.solidColor));
       } else if (a.kind === 'atlas-cell') {
@@ -9749,8 +9772,8 @@ Press Enter to return`,
             a.flipX && (h.scale.x = -1),
             (a.treatment === 'fade' || a.treatment === 'fade-solid') && (h.alpha = 0.5),
             (a.treatment === 'solid' || a.treatment === 'fade-solid') &&
-            a.solidColor !== void 0 &&
-            (h.tint = a.solidColor),
+              a.solidColor !== void 0 &&
+              (h.tint = a.solidColor),
             t.addChild(h));
         }
       } else if (a.kind === 'text') {
@@ -9770,21 +9793,21 @@ Press Enter to return`,
           ? (r = a.amount ?? 0)
           : a.effect === 'half-rect' || a.effect === 'quarter-rect'
             ? t.addChild(
-              new Graphics()
-                .rect(a.x ?? 0, a.y ?? 0, a.width ?? SCREEN_WIDTH, a.height ?? SCREEN_HEIGHT)
-                .fill({
-                  color: 0,
-                  alpha: a.amount ?? (a.effect === 'half-rect' ? 0.5 : 0.25),
-                }),
-            )
+                new Graphics()
+                  .rect(a.x ?? 0, a.y ?? 0, a.width ?? SCREEN_WIDTH, a.height ?? SCREEN_HEIGHT)
+                  .fill({
+                    color: 0,
+                    alpha: a.amount ?? (a.effect === 'half-rect' ? 0.5 : 0.25),
+                  }),
+              )
             : !i &&
-            (a.effect === 'fade-frozen' || a.effect === 'gray-frozen') &&
-            t.addChild(
-              new Graphics().rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT).fill({
-                color: 0,
-                alpha: 1 - (a.amount ?? 0.5),
-              }),
-            );
+              (a.effect === 'fade-frozen' || a.effect === 'gray-frozen') &&
+              t.addChild(
+                new Graphics().rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT).fill({
+                  color: 0,
+                  alpha: 1 - (a.amount ?? 0.5),
+                }),
+              );
       else if (a.kind === 'line')
         t.addChild(
           new Graphics().moveTo(a.x1, a.y1).lineTo(a.x2, a.y2).stroke({
@@ -9826,7 +9849,7 @@ Press Enter to return`,
             x: a.x,
             y: a.y,
           }),
-            a.title)
+          a.title)
         )
           if (a.pairedIcon) {
             const o = this.sourceBitmapWidth(3, a.title),
@@ -9855,8 +9878,8 @@ Press Enter to return`,
             x: a.x,
             y: a.y,
           }),
-            this.addSourceBitmap(t, a.titleFont === 'big-blue' ? 4 : 2, a.label, a.textX, a.textY),
-            a.subtitle &&
+          this.addSourceBitmap(t, a.titleFont === 'big-blue' ? 4 : 2, a.label, a.textX, a.textY),
+          a.subtitle &&
             this.addSourceBitmap(
               t,
               a.subtitleFont === 'small-blue' ? 1 : 0,
@@ -9864,7 +9887,7 @@ Press Enter to return`,
               a.textX,
               a.textY + 24,
             ),
-            a.value)
+          a.value)
         ) {
           const o = a.valueKind === 'key' ? 5 : 2,
             l = this.sourceBitmapWidth(o, a.value);
@@ -9917,7 +9940,7 @@ Press Enter to return`,
           alpha: 1 - RESULT_SCREEN.frozenSceneFade,
         }),
       ),
-        n)
+      n)
     ) {
       const o = new Sprite(n);
       (o.position.set(i.panel.x, i.panel.y), r.addChild(o));
@@ -9932,11 +9955,11 @@ Press Enter to return`,
     );
     if (
       ((this.endSword = a),
-        (this.endSwordBaseX = i.buttonCursorXs[this.endChoice]),
-        t.buttons.forEach((o, l) => {
-          this.addSourceBitmap(r, RESULT_SCREEN.fonts.bigGold, o, i.buttonTextXs[l], i.buttonY + 4);
-        }),
-        e.mode === 'arcade')
+      (this.endSwordBaseX = i.buttonCursorXs[this.endChoice]),
+      t.buttons.forEach((o, l) => {
+        this.addSourceBitmap(r, RESULT_SCREEN.fonts.bigGold, o, i.buttonTextXs[l], i.buttonY + 4);
+      }),
+      e.mode === 'arcade')
     ) {
       const o = t.players[0];
       if (o) {
@@ -10015,7 +10038,7 @@ Press Enter to return`,
           children: !0,
         }),
       ),
-        !this.endQuestion && !this.endPopup)
+      !this.endQuestion && !this.endPopup)
     )
       return;
     const e = new Container();
@@ -10026,7 +10049,7 @@ Press Enter to return`,
           alpha: 1 - QUESTION_DIM,
         }),
       ),
-        this.endQuestion && this.endQuestionState)
+      this.endQuestion && this.endQuestionState)
     ) {
       const t = this.sourceCroppedTexture('ui.guiform', QUESTION_LAYOUT.form),
         i = 140,
@@ -10044,9 +10067,9 @@ Press Enter to return`,
           e,
           QUESTION_LAYOUT.swordIcon,
           n -
-          4 +
-          this.endQuestionState.choice * QUESTION_LAYOUT.choiceGapX +
-          questionBlink(this.endQuestionState.swordDraws),
+            4 +
+            this.endQuestionState.choice * QUESTION_LAYOUT.choiceGapX +
+            questionBlink(this.endQuestionState.swordDraws),
           a + QUESTION_LAYOUT.choicesY - 4,
           'end-question-sword',
         ),
@@ -10132,17 +10155,17 @@ Press Enter to return`,
     this.introCover &&
       this.introCoverFilter &&
       ((this.introCover.y = Math.trunc(e.coverY)),
-        this.setDisplayAdditiveHue(this.introCover, this.introCoverFilter, e.coverHue));
+      this.setDisplayAdditiveHue(this.introCover, this.introCoverFilter, e.coverHue));
     for (const t of this.introCharacterViews.values())
       ((t.band.visible = !1), (t.head.visible = !1));
     for (const t of e.characters) {
       const i = this.introCharacterViews.get(t.cue.frame);
       i &&
         ((i.band.visible = t.showBand),
-          i.band.position.set(0, t.cue.y),
-          (i.head.visible = t.showHead),
-          i.head.position.set(Math.trunc(t.x), t.cue.y),
-          t.showHead && this.setDisplayAdditiveHue(i.head, i.filter, t.hue));
+        i.band.position.set(0, t.cue.y),
+        (i.head.visible = t.showHead),
+        i.head.position.set(Math.trunc(t.x), t.cue.y),
+        t.showHead && this.setDisplayAdditiveHue(i.head, i.filter, t.hue));
     }
   }
   renderSplash() {
@@ -10166,10 +10189,10 @@ Press Enter to return`,
     const l = this.sourceBitmapText(2, 'Press Any Button');
     if (
       (l.container.position.set(SCREEN_WIDTH / 2 - Math.trunc(l.width / 2), 305),
-        (l.container.visible = !1),
-        (this.splashPrompt = l.container),
-        t.addChild(l.container),
-        a.owner !== null)
+      (l.container.visible = !1),
+      (this.splashPrompt = l.container),
+      t.addChild(l.container),
+      a.owner !== null)
     ) {
       const c = this.sourceBitmapText(a.registrationFont, a.owner);
       (c.container.position.set(
@@ -10274,8 +10297,8 @@ Press Enter to return`,
           children: !0,
         }),
       ),
-        (this.menuSword = void 0),
-        this.drawSourceMenu(t, 0));
+      (this.menuSword = void 0),
+      this.drawSourceMenu(t, 0));
   }
   drawSourceMenu(e, t) {
     const i = this.menuPanel;
@@ -10329,12 +10352,12 @@ Press Enter to return`,
         const x = this.sourceGuiIconTexture(1, 'sword');
         x &&
           ((this.menuSword = new Sprite(x)),
-            (this.menuSwordBaseX = e.x + 22),
-            this.menuSword.position.set(
-              this.menuSwordBaseX + (Math.floor(this.screenFrame / 10) & 1),
-              u + 2,
-            ),
-            i.addChild(this.menuSword));
+          (this.menuSwordBaseX = e.x + 22),
+          this.menuSword.position.set(
+            this.menuSwordBaseX + (Math.floor(this.screenFrame / 10) & 1),
+            u + 2,
+          ),
+          i.addChild(this.menuSword));
       }
     }
     const l = this.sourceCroppedTexture('ui.guiform', 7);
@@ -10398,7 +10421,7 @@ Press Enter to return`,
           buttonMaps: this.settings.buttonMaps,
         }),
       )),
-        this.renderMenuSelection());
+      this.renderMenuSelection());
   }
   renderHeroSelection() {
     if (this.screen !== 'hero') return;
@@ -10409,17 +10432,17 @@ Press Enter to return`,
       i = this.images.get('bg-select-1');
     i && e.addChild(new Sprite(i));
     const r =
-      this.sourceMode === 'tutorial'
-        ? 'START TUTORIAL'
-        : this.sourceMode === 'survival'
-          ? 'SURVIVAL MODE'
-          : this.sourceMode === 'practice'
-            ? 'PRACTICE MODE'
-            : this.sourceMode === 'arena'
-              ? 'ARENA MODE'
-              : this.sourceMode === 'arcade'
-                ? 'ARCADE MODE'
-                : 'PLAYER SELECT',
+        this.sourceMode === 'tutorial'
+          ? 'START TUTORIAL'
+          : this.sourceMode === 'survival'
+            ? 'SURVIVAL MODE'
+            : this.sourceMode === 'practice'
+              ? 'PRACTICE MODE'
+              : this.sourceMode === 'arena'
+                ? 'ARENA MODE'
+                : this.sourceMode === 'arcade'
+                  ? 'ARCADE MODE'
+                  : 'PLAYER SELECT',
       n = this.sourceBitmapText(3, r);
     (n.container.position.set(Math.trunc((SCREEN_WIDTH - n.width) / 2), -n.height),
       e.addChild(n.container));
@@ -10448,13 +10471,13 @@ Press Enter to return`,
         (I.position.set(0, x), a.addChild(I));
       }
       const _ = this.sourcePlriconTexture(
-        4,
-        2,
-        3,
-        HERO_CARD_WIDTH,
-        HERO_CARD_HEIGHT,
-        'player-confirmed',
-      ),
+          4,
+          2,
+          3,
+          HERO_CARD_WIDTH,
+          HERO_CARD_HEIGHT,
+          'player-confirmed',
+        ),
         S = new Sprite(_ ?? Texture.EMPTY);
       (S.position.set(0, x),
         (S.visible = g === this.heroSelectConfirmedIndex),
@@ -10547,7 +10570,7 @@ Press Enter to return`,
       i = this.sourcePlriconTexture(2, e.cursorFrame, 2, 11, 16, `player-arrow-${e.cursorFrame}`);
     this.heroSelectArrow &&
       ((this.heroSelectArrow.texture = i ?? Texture.EMPTY),
-        this.heroSelectArrow.position.set(-13, t + Math.floor(HERO_CARD_HEIGHT / 2) - 8));
+      this.heroSelectArrow.position.set(-13, t + Math.floor(HERO_CARD_HEIGHT / 2) - 8));
     const r = 3 + e.cursorFrame,
       n = this.sourcePlriconTexture(
         4,
@@ -10559,7 +10582,7 @@ Press Enter to return`,
       );
     this.heroSelectHighlight &&
       ((this.heroSelectHighlight.texture = n ?? Texture.EMPTY),
-        this.heroSelectHighlight.position.set(0, t));
+      this.heroSelectHighlight.position.set(0, t));
   }
   sourcePlriconTexture(e, t, i, r, n, a) {
     const o = atlasCellPosition(t, i, r, n);
@@ -10583,14 +10606,14 @@ Press Enter to return`,
     const c = this.sourceCroppedTexture('ui.guiform', 18);
     c && a.addChild(new Sprite(c));
     const h =
-      n?.title ??
-      (e.mode === 'arena'
-        ? 'ARENA STAGES'
-        : e.mode === 'show'
-          ? 'FIGHT SHOWS'
-          : e.mode === 'gallery'
-            ? 'IMAGE GALLERY'
-            : 'ARCADE CHAPTERS'),
+        n?.title ??
+        (e.mode === 'arena'
+          ? 'ARENA STAGES'
+          : e.mode === 'show'
+            ? 'FIGHT SHOWS'
+            : e.mode === 'gallery'
+              ? 'IMAGE GALLERY'
+              : 'ARCADE CHAPTERS'),
       u = this.sourceBitmapText(3, h);
     (u.container.position.set(Math.trunc((MENU_MAX_HEIGHT - u.width) / 2) - 2, 18),
       a.addChild(u.container));
@@ -10610,8 +10633,8 @@ Press Enter to return`,
         w = this.sourceBitmapText(x ? 2 : 4, S.replace(/\*$/, ''));
       if (
         (w.container.position.set(95, p + 5),
-          a.addChild(w.container),
-          (x && _) || (!x && S.endsWith('*')))
+        a.addChild(w.container),
+        (x && _) || (!x && S.endsWith('*')))
       ) {
         const A = this.sourceGuiIconTexture(16, 'movie');
         if (A) {
@@ -10627,9 +10650,9 @@ Press Enter to return`,
     }
     if (
       ((this.chapterCursor = new Sprite(Texture.EMPTY)),
-        a.addChild(this.chapterCursor),
-        this.screenLayer.addChild(a),
-        e.replay)
+      a.addChild(this.chapterCursor),
+      this.screenLayer.addChild(a),
+      e.replay)
     )
       this.renderChapterHints();
     else {
@@ -10658,13 +10681,13 @@ Press Enter to return`,
       (this.chapterMove =
         o.steps > 0
           ? {
-            startX: l,
-            startY: o.y,
-            targetX: l,
-            targetY: o.targetY,
-            step: 0,
-            steps: o.steps,
-          }
+              startX: l,
+              startY: o.y,
+              targetX: l,
+              targetY: o.targetY,
+              step: 0,
+              steps: o.steps,
+            }
           : void 0),
       this.refreshChapterCursor());
   }
@@ -10701,7 +10724,7 @@ Press Enter to return`,
           children: !0,
         }),
       ),
-        !e)
+      !e)
     )
       return;
     const t = new Container();
@@ -10945,10 +10968,10 @@ Press Enter to return`,
       r = i ? this.atlases.get(i.atlas) : void 0;
     return !i || !r
       ? {
-        container: new Container(),
-        width: 0,
-        height: 0,
-      }
+          container: new Container(),
+          width: 0,
+          height: 0,
+        }
       : buildBitmapText(i, r, t, this.sourceTextureCache);
   }
   sourceBitmapWidth(e, t) {
@@ -10989,10 +11012,10 @@ Press Enter to return`,
       entry: i,
     }),
       t !== e &&
-      this.atlases.set(t, {
-        textures: n,
-        entry: i,
-      }));
+        this.atlases.set(t, {
+          textures: n,
+          entry: i,
+        }));
   }
   async ensureImage(e) {
     if (this.images.has(e)) return;
@@ -11111,7 +11134,7 @@ Press Enter to return`,
       this.highScore = this.score;
       try {
         localStorage.setItem(RAGE_HIGH_SCORE_KEY, String(this.highScore));
-      } catch { }
+      } catch {}
     }
   }
   loadProgress() {
@@ -11154,22 +11177,22 @@ Press Enter to return`,
     if (!(this.chapterSession?.replay === !0 || this.endResult?.gameReplay === !0))
       try {
         localStorage.setItem(RAGE_PROGRESS_KEY, JSON.stringify(this.progress));
-      } catch { }
+      } catch {}
   }
   emitState(e = !1) {
     const t = {
-      loaded: this.loaded,
-      paused: this.paused,
-      muted: this.audio.muted,
-      rankedScoreEligible: this.rankedScoreEligible,
-      status: this.screen,
-      score: this.score,
-      highScore: this.highScore,
-      mode: this.sourceMode,
-      hero: HEROES[this.heroIndex].id,
-      chapter: this.chapterIndex + 1,
-      enemies: this.actors.filter((r) => r.isLiving() && r.align === 2).length,
-    },
+        loaded: this.loaded,
+        paused: this.paused,
+        muted: this.audio.muted,
+        rankedScoreEligible: this.rankedScoreEligible,
+        status: this.screen,
+        score: this.score,
+        highScore: this.highScore,
+        mode: this.sourceMode,
+        hero: HEROES[this.heroIndex].id,
+        chapter: this.chapterIndex + 1,
+        enemies: this.actors.filter((r) => r.isLiving() && r.align === 2).length,
+      },
       i = JSON.stringify(t);
     (!e && i === this.lastState) || ((this.lastState = i), this.onStateChange?.(t));
   }

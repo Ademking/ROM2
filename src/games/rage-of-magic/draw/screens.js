@@ -763,7 +763,9 @@ function drawSelectScreen(s) {
     e.mode === 'versus' && i.push(text('small-blue', 'Both Players Required!', 256, 356, 'center')),
     e.panels.forEach((r, n) => {
       const a = e.players[n];
-      a &&
+      // Survival has no second player, so it has no second panel either.
+      (e.mode !== 'survival' || n === 0) &&
+        a &&
         i.push(
           ...(a.mode === 0
             ? drawVersusSelectPanel(e, n, Math.trunc(r.x), Math.trunc(r.y), t.cursorFrame)

@@ -15,6 +15,7 @@ import {
   SELECT_HUE_START,
   SELECT_HUE_STEP,
   SELECT_LAYOUT,
+  SELECT_SINGLE_PANEL_X,
   SELECT_LEVEL_SLOT,
   SELECT_MESSAGE_FRAMES,
 } from './data.js';
@@ -248,6 +249,7 @@ function newSelectState(s) {
       },
     ),
     r = s.mode === 'arcade' ? Math.trunc(s.carriedMaxAllies ?? 0) : t.maxAllies,
+    // Survival is one player, so its panel slides to the middle of the screen.
     n = SELECT_LAYOUT.panels.map((o, l) => ({
       playerIndex: l,
       x: o.startX,
@@ -259,7 +261,7 @@ function newSelectState(s) {
       queue: [
         {
           kind: 'move',
-          targetX: o.targetX,
+          targetX: s.mode === 'survival' && l === 0 ? SELECT_SINGLE_PANEL_X : o.targetX,
           steps: SELECT_ENTRANCE_STEPS,
           ease: 'in',
         },
