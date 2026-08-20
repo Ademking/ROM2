@@ -170,14 +170,19 @@ src/
 ├── main.js                 entry point: creates the Pixi app, sizes the canvas,
 │                           pumps the fixed-step loop, forwards the keyboard
 ├── styles/game.css         the page around the canvas
-├── lib/                    asset paths, audio library, canvas fitting
+├── lib/                    asset-path · audio-library · brand-intro
+│                           canvas-fit · display-scale
 └── games/rage-of-magic/
     ├── game.js             the main engine class
-    ├── constants.js  document-parse.js  actor.js  bounds.js  bonuses.js
-    ├── settings.js   keyboard.js  cheats.js  camera.js  timing.js
-    ├── layers.js     atlas.js     scoring.js   versus.js  high-scores.js
-    ├── ai/                 enemy · ally · circle · fairy · wisp · animal · track
-    ├── screens/            intro · title · loading · novel · question · pause · attract
+    ├── actor · bounds · bonuses · camera · layers · timing · atlas
+    ├── constants · game-constants · document-parse · modes · routing
+    ├── settings · keyboard · gamepad · cheats · name-entry · storage
+    ├── scoring · versus · high-scores · color-matrix
+    ├── ai/                 enemy · ally · animal · circle · fairy · track · wisp
+    │                       plus constants · helpers
+    ├── screens/            brand-screen · intro-panels · intro-swords
+    │                       title-screen · loading-screen · novel
+    │                       question · pause · attract
     ├── menu/               layout · options
     ├── select/             data · state
     └── draw/               atlas-sheets · screens
