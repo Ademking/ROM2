@@ -1,0 +1,750 @@
+{
+  "game": "rage-of-magic",
+  "sounds": {
+    "001a": {
+      "url": "/audio/rage-of-magic/sounds/001a.wav",
+      "polyphony": 1,
+      "sha256": "834797d301d52391640b8e09de99c3630024f9a496a2a106cbb050eda502eaab"
+    },
+    "001b": {
+      "url": "/audio/rage-of-magic/sounds/001b.wav",
+      "polyphony": 1,
+      "sha256": "c1a68a77fe9891a54dc618b2b0c6e927e84b550df1820e13281e74cdd15a3aef"
+    },
+    "002a": {
+      "url": "/audio/rage-of-magic/sounds/002a.wav",
+      "polyphony": 1,
+      "sha256": "85e4af477d7dc8bfb9201c0164c3919ccac7cfb762e9395b9fb81a463222d02a"
+    },
+    "002b": {
+      "url": "/audio/rage-of-magic/sounds/002b.wav",
+      "polyphony": 1,
+      "sha256": "1a5a91c93cd178764851b6d8c3f62aa7fadcc2bd3b7b4bd1e5b037562c2671dd"
+    },
+    "003a": {
+      "url": "/audio/rage-of-magic/sounds/003a.wav",
+      "polyphony": 1,
+      "sha256": "30eed84912626c435a8a7f51d4e965762d1778b1e3235e17e55614a364a6b92b"
+    },
+    "003b": {
+      "url": "/audio/rage-of-magic/sounds/003b.wav",
+      "polyphony": 1,
+      "sha256": "77e7840109bd2fa1b25a8d7ce2e8fba50b55d2127cef8242fdd506e55da07179"
+    },
+    "004a": {
+      "url": "/audio/rage-of-magic/sounds/004a.wav",
+      "polyphony": 1,
+      "sha256": "1965dda97d7fc8bf77e71816e4d55c3e88d8b1973c23ee7e83600e1a49f6e4ec"
+    },
+    "004b": {
+      "url": "/audio/rage-of-magic/sounds/004b.wav",
+      "polyphony": 1,
+      "sha256": "1a3a69c1561e1b3470bd9fec577f1995c20eeca29206093e458dc886a0e25641"
+    },
+    "005": {
+      "url": "/audio/rage-of-magic/sounds/005.wav",
+      "polyphony": 1,
+      "sha256": "25ed37a339ab8746003151a383a795897990aa21cb48202ebaa0029d45473daf"
+    },
+    "006a": {
+      "url": "/audio/rage-of-magic/sounds/006a.wav",
+      "polyphony": 1,
+      "sha256": "f4d0086f25ae0e6675a1c42ca838a135f478c6be864d81597d9ec471da854c4a"
+    },
+    "006b": {
+      "url": "/audio/rage-of-magic/sounds/006b.wav",
+      "polyphony": 1,
+      "sha256": "615d8a605f35fd585f16383f3edbf48337d93c966ba9cb1665eccf5c5fca4ba0"
+    },
+    "007": {
+      "url": "/audio/rage-of-magic/sounds/007.wav",
+      "polyphony": 1,
+      "sha256": "e58bce43142982c6cc0747793282cd83e35d0c58cb5adf8ba3c87bc935135d7d"
+    },
+    "008": {
+      "url": "/audio/rage-of-magic/sounds/008.wav",
+      "polyphony": 1,
+      "sha256": "6c0dff968554852c708b2f7cb976e4644eaabfbd2737af8639fa61ed7de5346b"
+    },
+    "009": {
+      "url": "/audio/rage-of-magic/sounds/009.wav",
+      "polyphony": 1,
+      "sha256": "7a5c0641b3dd53a6986da03abfa8bda92a68222624fb8a2edd6391dc00481497"
+    },
+    "010": {
+      "url": "/audio/rage-of-magic/sounds/010.wav",
+      "polyphony": 1,
+      "sha256": "896e266f9c76c7448f076dfdb085df9c535fd64991a45361e96f0de7917d7b62"
+    },
+    "011": {
+      "url": "/audio/rage-of-magic/sounds/011.wav",
+      "polyphony": 1,
+      "sha256": "6450462ddf256d162a2fd3563d64ccd418aee18ceaa2f03a44b0976980362470"
+    },
+    "012a": {
+      "url": "/audio/rage-of-magic/sounds/012a.wav",
+      "polyphony": 1,
+      "sha256": "6ade1a8cd8d83f75fb427902a9f0ac73380c2751862549bd0b29f0bc465b9ba3"
+    },
+    "012b": {
+      "url": "/audio/rage-of-magic/sounds/012b.wav",
+      "polyphony": 1,
+      "sha256": "86619ef6111720c568420b87284d9661efaa5287115d31be3282679baeb1572c"
+    },
+    "100a": {
+      "url": "/audio/rage-of-magic/sounds/100a.wav",
+      "polyphony": 1,
+      "sha256": "adc65fbe4a3ffbde608c30cc9df4d9f419dc290aea9aafda67d3b7dae7a2bd2a"
+    },
+    "100b": {
+      "url": "/audio/rage-of-magic/sounds/100b.wav",
+      "polyphony": 1,
+      "sha256": "977dfb09b9d2fa8195f0e54840e97e88c8a1411ff40f8711e89609bcd3ad50a0"
+    },
+    "absorb": {
+      "url": "/audio/rage-of-magic/sounds/absorb.wav",
+      "polyphony": 4,
+      "sha256": "26dd08267ae3579038b4b7ba89be91bf39c9ebcb20e032c4655a458ddbd802b3"
+    },
+    "acorra": {
+      "url": "/audio/rage-of-magic/sounds/acorra.wav",
+      "polyphony": 4,
+      "sha256": "e744c38a044fac614d2697f9374c808a7d9e926d50565693be56fdd456cd4ae0"
+    },
+    "amazeya": {
+      "url": "/audio/rage-of-magic/sounds/amazeya.wav",
+      "polyphony": 4,
+      "sha256": "9e869eace9c3d2033d07500a014fe2dd2df4cb52d7d0ab0060b79888c4cfd7bc"
+    },
+    "arrow": {
+      "url": "/audio/rage-of-magic/sounds/arrow.wav",
+      "polyphony": 4,
+      "sha256": "ae63832bfb3f6fd55efb391fb7f4c965663442b76373ea931a13fb517eb3f970"
+    },
+    "az1h": {
+      "url": "/audio/rage-of-magic/sounds/az1h.wav",
+      "polyphony": 4,
+      "sha256": "b782c11f473abc8b4779f9e510b7d03dddca4a4ce84d34b5027c58061bd63410"
+    },
+    "az2h": {
+      "url": "/audio/rage-of-magic/sounds/az2h.wav",
+      "polyphony": 4,
+      "sha256": "a5a1b39fd1e63169e4d0f2a4abc960173fc299a7bfc437b63adfa806314bfea9"
+    },
+    "azdie": {
+      "url": "/audio/rage-of-magic/sounds/azdie.wav",
+      "polyphony": 4,
+      "sha256": "29e3af25a48489b6fd1cf71e3346afd532f63db1ba0e18a5edcf498ae6b50d18"
+    },
+    "azhaha": {
+      "url": "/audio/rage-of-magic/sounds/azhaha.wav",
+      "polyphony": 4,
+      "sha256": "8b4cb9e377dbf3429c1576217c684818eb58b56f81f717925aa6f3ea38a756cc"
+    },
+    "azpanic": {
+      "url": "/audio/rage-of-magic/sounds/azpanic.wav",
+      "polyphony": 4,
+      "sha256": "12fa5e528a55ad33f62affe6477f701830077bca37f40db656a460dbc9826d10"
+    },
+    "azslam": {
+      "url": "/audio/rage-of-magic/sounds/azslam.wav",
+      "polyphony": 4,
+      "sha256": "47a44e90c3bb85bbd11b2945c44c18c8402cb86369a90ef24a3356f369394346"
+    },
+    "azsuper": {
+      "url": "/audio/rage-of-magic/sounds/azsuper.wav",
+      "polyphony": 4,
+      "sha256": "f99f3ba2d4fa29aba2eb8fa710d9897eba99e2038931b88d8d2dfde68707eccf"
+    },
+    "bakaha": {
+      "url": "/audio/rage-of-magic/sounds/bakaha.wav",
+      "polyphony": 4,
+      "sha256": "5d3670f219662bb2f4f84b77d52e4b22e27003b91c0ceb6cd59b0bc663a1d531"
+    },
+    "bakahe": {
+      "url": "/audio/rage-of-magic/sounds/bakahe.wav",
+      "polyphony": 4,
+      "sha256": "54317177f5fd165add27dea7449cd645c2b1c777adca7d3e619eb96165c6d8e7"
+    },
+    "bakayu": {
+      "url": "/audio/rage-of-magic/sounds/bakayu.wav",
+      "polyphony": 4,
+      "sha256": "34c3e218dbb5183a7e3348924ffc771537f8aaafb3d240c1f57648d2a9704417"
+    },
+    "beam": {
+      "url": "/audio/rage-of-magic/sounds/beam.wav",
+      "polyphony": 4,
+      "sha256": "a2151f167af2334305c51a868b7cbf1d1cc723948876db9f6e48e88cf4f5b871"
+    },
+    "bigelec": {
+      "url": "/audio/rage-of-magic/sounds/bigelec.wav",
+      "polyphony": 4,
+      "sha256": "1eaa8d5bacefd1fa07e7933011d87b51d347b9c2f2a7c4cf19102664deee29c2"
+    },
+    "bigpunch": {
+      "url": "/audio/rage-of-magic/sounds/bigpunch.wav",
+      "polyphony": 4,
+      "sha256": "0c9e5f66cc4339b7b5c02924e8190a71b6d7d7bf04fc093cd47964e8bbab820e"
+    },
+    "blip": {
+      "url": "/audio/rage-of-magic/sounds/blip.wav",
+      "polyphony": 4,
+      "sha256": "bb298af9a2649647fd65bf8f3a71146249cccbd3a362be807a00ef9e6869ae9b"
+    },
+    "blockmagic": {
+      "url": "/audio/rage-of-magic/sounds/blockmagic.wav",
+      "polyphony": 4,
+      "sha256": "4cd2ef2172c94650411e1245567bbd7196c084ef71172712b2bbd23ab6265aee"
+    },
+    "blockmetal": {
+      "url": "/audio/rage-of-magic/sounds/blockmetal.wav",
+      "polyphony": 4,
+      "sha256": "82877d678dd9118d169e2de5fa32cd7fe4ddc8848b6ae195c03c51105db87321"
+    },
+    "chanthi": {
+      "url": "/audio/rage-of-magic/sounds/chanthi.wav",
+      "polyphony": 4,
+      "sha256": "02e879f27ce269ea7ec65832962b559d1f63d1de56a3ec9465efccafd7ec9275"
+    },
+    "chantlo": {
+      "url": "/audio/rage-of-magic/sounds/chantlo.wav",
+      "polyphony": 4,
+      "sha256": "801797e70a841a445e4fc4cd6052a1793d38ac173c932db577ef442cbe875501"
+    },
+    "chikhit": {
+      "url": "/audio/rage-of-magic/sounds/chikhit.wav",
+      "polyphony": 4,
+      "sha256": "6ff74756cd256baf6c2d4ad2ee35d61c5556f99ab5cc007f6ee7fbfe4d2af8ad"
+    },
+    "click": {
+      "url": "/audio/rage-of-magic/sounds/click.wav",
+      "polyphony": 4,
+      "sha256": "ceaabe54efb324e4f508be13926a97757516c93629fd119a4412d9824ba30428"
+    },
+    "coin": {
+      "url": "/audio/rage-of-magic/sounds/coin.wav",
+      "polyphony": 4,
+      "sha256": "30cfc45459b3a46654cba8d0de2d5d492ab9d3a9a868d8b21e95d8312b08f4d2"
+    },
+    "creak": {
+      "url": "/audio/rage-of-magic/sounds/creak.wav",
+      "polyphony": 4,
+      "sha256": "16c9627e3f63ace08b84c2984acd0a7b959816e29ad9c285c009c26ccc6a3bfb"
+    },
+    "dlrdha": {
+      "url": "/audio/rage-of-magic/sounds/dlrdha.wav",
+      "polyphony": 4,
+      "sha256": "d0b35cb1aa9bab8ff27def68ac280db09fc94862ad09ff070ac23306763a930b"
+    },
+    "dordie": {
+      "url": "/audio/rage-of-magic/sounds/dordie.wav",
+      "polyphony": 4,
+      "sha256": "9e1d2f232788e8b94f19d5336078e2adb363ac5dadbe4b953906c72640b78ade"
+    },
+    "dorhuu": {
+      "url": "/audio/rage-of-magic/sounds/dorhuu.wav",
+      "polyphony": 4,
+      "sha256": "4ac702c80aba0b6c36e33e1e672fe253a6811c8e9aea11f61377de9cb678e286"
+    },
+    "dorhwa": {
+      "url": "/audio/rage-of-magic/sounds/dorhwa.wav",
+      "polyphony": 4,
+      "sha256": "69d67561b2000cdcd2db447810466675ee9e7730ac68ef951e004e82f33958dd"
+    },
+    "dorrock": {
+      "url": "/audio/rage-of-magic/sounds/dorrock.wav",
+      "polyphony": 4,
+      "sha256": "66ac1ead023e3072ddb12f9583cb017ec206432540d660f456e5df8c247ffb0f"
+    },
+    "dorsha": {
+      "url": "/audio/rage-of-magic/sounds/dorsha.wav",
+      "polyphony": 4,
+      "sha256": "2fbdd8058b2347990deeb25614fc8023a26e2f5e49265f791ead6a34252d9a58"
+    },
+    "drink": {
+      "url": "/audio/rage-of-magic/sounds/drink.wav",
+      "polyphony": 4,
+      "sha256": "d97a69dee1757a95a6fe1b6bcb1edb535adbccda8bbd0128968fa09fb4d88904"
+    },
+    "eat": {
+      "url": "/audio/rage-of-magic/sounds/eat.wav",
+      "polyphony": 4,
+      "sha256": "271c9a69bb833f01cb01f5aadd86be0c059231d5bed5b767e2ff779cfddd8d36"
+    },
+    "elec": {
+      "url": "/audio/rage-of-magic/sounds/elec.wav",
+      "polyphony": 4,
+      "sha256": "a87ff69bf8a085966675d4ad8db9c3e9f43191c9a051cf0b9d7a3c175c660bbb"
+    },
+    "error": {
+      "url": "/audio/rage-of-magic/sounds/error.wav",
+      "polyphony": 4,
+      "sha256": "ecb4c9e7e982cbc4498a454907533f39933094478f04f8d7a68c17b7b5489cc2"
+    },
+    "eva2h": {
+      "url": "/audio/rage-of-magic/sounds/eva2h.wav",
+      "polyphony": 4,
+      "sha256": "d4eaafbe30a27d5cc0bc6b20aba9d103ad1cc882890ed056f01d582be88fb66a"
+    },
+    "evadie": {
+      "url": "/audio/rage-of-magic/sounds/evadie.wav",
+      "polyphony": 4,
+      "sha256": "958ad57807d64f886499ea96b6ecc1318530e6232ef140938b3a2d399e2abbd1"
+    },
+    "evaha": {
+      "url": "/audio/rage-of-magic/sounds/evaha.wav",
+      "polyphony": 4,
+      "sha256": "2e8006372e798f8ca0647ee07ea3f06e17eeefb212cc09f9d4b74ff9b3728bf4"
+    },
+    "evahaha": {
+      "url": "/audio/rage-of-magic/sounds/evahaha.wav",
+      "polyphony": 4,
+      "sha256": "97f149d796349b1ea23ecdb422da4e9c260ca67febcf9772e049a6e25cba2e39"
+    },
+    "explode": {
+      "url": "/audio/rage-of-magic/sounds/explode.wav",
+      "polyphony": 4,
+      "sha256": "359ca25e8610ea89d063ba025052e5193eb8afb15ed43e3a2547681a78f007a9"
+    },
+    "fadeout": {
+      "url": "/audio/rage-of-magic/sounds/fadeout.wav",
+      "polyphony": 4,
+      "sha256": "67906b608217bb7a5a82e7bd370e145d1811b05d86aae7a24f2b5d39d10d6e8c"
+    },
+    "failure": {
+      "url": "/audio/rage-of-magic/sounds/failure.wav",
+      "polyphony": 4,
+      "sha256": "e8d5b7a0ccc27ef22cb31304046aebfd61dc5dbd3cf307ad72a5b85e269631ce"
+    },
+    "fairy": {
+      "url": "/audio/rage-of-magic/sounds/fairy.wav",
+      "polyphony": 4,
+      "sha256": "c4297d4e6755442b6c20c5fee9c3d868e2fb3d876859ad56d220c7441c8c5986"
+    },
+    "faudie": {
+      "url": "/audio/rage-of-magic/sounds/faudie.wav",
+      "polyphony": 4,
+      "sha256": "504c7a9e3c117af84cfc3608bd1b31b64dd79896c10336faa3ba6e2edb63d2b6"
+    },
+    "faufoo": {
+      "url": "/audio/rage-of-magic/sounds/faufoo.wav",
+      "polyphony": 4,
+      "sha256": "84b88d95829943191b408137b4d1f26594725047dd4f76b67e89adca17b62eee"
+    },
+    "faugone": {
+      "url": "/audio/rage-of-magic/sounds/faugone.wav",
+      "polyphony": 4,
+      "sha256": "ffee459f75cb1e7fa38f0493324df7fb3527f2696f1c31d3606c8ac0176bd39b"
+    },
+    "fauhaa": {
+      "url": "/audio/rage-of-magic/sounds/fauhaa.wav",
+      "polyphony": 4,
+      "sha256": "9e2c21bac1680744308b5ef61f86c848e3c3134e164f4476ce9a43f628393a5d"
+    },
+    "fauhuh": {
+      "url": "/audio/rage-of-magic/sounds/fauhuh.wav",
+      "polyphony": 4,
+      "sha256": "87518843a27b94ee52e256db77f53464df7d0917c7f0287b4b3def8633b254b4"
+    },
+    "fauqdie": {
+      "url": "/audio/rage-of-magic/sounds/fauqdie.wav",
+      "polyphony": 4,
+      "sha256": "6e079816e56d9998a21d13144b74c3c695be9b6165a069692f422bf547733ada"
+    },
+    "fistblck": {
+      "url": "/audio/rage-of-magic/sounds/fistblck.wav",
+      "polyphony": 4,
+      "sha256": "cb08a86c23d0bb359d8904ad5970f5bd8b04b92d18dc4c10ed1a8a43f7e5332a"
+    },
+    "flame": {
+      "url": "/audio/rage-of-magic/sounds/flame.wav",
+      "polyphony": 4,
+      "sha256": "4bcc9af4f5d91e4557f7fe72fe2f1be813a606c9929ceb5417a606fac91f6aea"
+    },
+    "foot": {
+      "url": "/audio/rage-of-magic/sounds/foot.wav",
+      "polyphony": 4,
+      "sha256": "6c21218fbbab4ea498ffb5086480c2a56c3c084c3a55c85abe966d0789d34b00"
+    },
+    "girldie": {
+      "url": "/audio/rage-of-magic/sounds/girldie.wav",
+      "polyphony": 4,
+      "sha256": "6a2120052edb6c485708bbf9f54c0c190784476f7925316e5b70eff15dc6c2a8"
+    },
+    "glass": {
+      "url": "/audio/rage-of-magic/sounds/glass.wav",
+      "polyphony": 4,
+      "sha256": "b73d97ebb4a190aec08a359fdf3d102d8822db3fd12f0d27d15a6d80efffd126"
+    },
+    "gling": {
+      "url": "/audio/rage-of-magic/sounds/gling.wav",
+      "polyphony": 4,
+      "sha256": "aa15b411f7534edb8fdb2c0e7e49cc26bbfe5667dbc53d91d2c3067e102346d5"
+    },
+    "gogo": {
+      "url": "/audio/rage-of-magic/sounds/gogo.wav",
+      "polyphony": 4,
+      "sha256": "974053f58279da20e45e47901e5d840f511d1c3bd9c5195fea85b9f86b54fbca"
+    },
+    "grunt": {
+      "url": "/audio/rage-of-magic/sounds/grunt.wav",
+      "polyphony": 4,
+      "sha256": "f9f9214b84ce659626376d58790771b937e2cad095be40ecfbf208b1f7a822fa"
+    },
+    "guardbrk": {
+      "url": "/audio/rage-of-magic/sounds/guardbrk.wav",
+      "polyphony": 4,
+      "sha256": "c65a49c65a8ae9d80ed90927d89122a1f4da23432da56f44ae96fa9807c2a026"
+    },
+    "hitblood1": {
+      "url": "/audio/rage-of-magic/sounds/hitblood1.wav",
+      "polyphony": 4,
+      "sha256": "2d3289e16bc2f6e3096cda99d3b6eed78eee7bc0aad4997ba5c73fbc64a3c35b"
+    },
+    "hitblood2": {
+      "url": "/audio/rage-of-magic/sounds/hitblood2.wav",
+      "polyphony": 4,
+      "sha256": "f22e5f3cc6d599efc16a8fa283c5bf0d3c022147a9fd289e2a3b25ecaf8ee560"
+    },
+    "hitblood3": {
+      "url": "/audio/rage-of-magic/sounds/hitblood3.wav",
+      "polyphony": 4,
+      "sha256": "addbccf27b720d4e1f286926e3248580c5836408ee04ba3166815e014a9953a6"
+    },
+    "hitfall": {
+      "url": "/audio/rage-of-magic/sounds/hitfall.wav",
+      "polyphony": 4,
+      "sha256": "55511be706a18ea22d0c99e754c06647d07635abcef799e2fb6d19944e67776f"
+    },
+    "hitmagic1": {
+      "url": "/audio/rage-of-magic/sounds/hitmagic1.wav",
+      "polyphony": 4,
+      "sha256": "f9f2ec8fe905dd8fecfbf9510f45132b208aaee52678745a079704e49230e7e4"
+    },
+    "hitmagic2": {
+      "url": "/audio/rage-of-magic/sounds/hitmagic2.wav",
+      "polyphony": 4,
+      "sha256": "ba1bf76307b80ba00dcb900b77b3ed23830d20c5d505883d72c9eb03c9f919cd"
+    },
+    "hitthud": {
+      "url": "/audio/rage-of-magic/sounds/hitthud.wav",
+      "polyphony": 4,
+      "sha256": "fbdf0d629d6820f9c0e95713da5c6c625447ee5aae47c0489eb6e3d4dd7f3029"
+    },
+    "hitwood": {
+      "url": "/audio/rage-of-magic/sounds/hitwood.wav",
+      "polyphony": 4,
+      "sha256": "6c9c64bb17a31bf9ac0b25f15f0b0f4b5a86161082ad6e9b91dfc28001be5946"
+    },
+    "lucdie": {
+      "url": "/audio/rage-of-magic/sounds/lucdie.wav",
+      "polyphony": 4,
+      "sha256": "a7de997cfb0c8c3c4328786eaac7c203aeb838ca82aca69ad8d52bfe75ef5773"
+    },
+    "luceya": {
+      "url": "/audio/rage-of-magic/sounds/luceya.wav",
+      "polyphony": 4,
+      "sha256": "7a558473a1d9965efac0b9677dbe3770b2f6f44401df4aca3f178c062cf69f50"
+    },
+    "lucflash": {
+      "url": "/audio/rage-of-magic/sounds/lucflash.wav",
+      "polyphony": 4,
+      "sha256": "bf226c872082ad6f0b3e2cb1e1c3c00454994e16e84990b213d6b0a417e24da5"
+    },
+    "luchah": {
+      "url": "/audio/rage-of-magic/sounds/luchah.wav",
+      "polyphony": 4,
+      "sha256": "f2dea2eab1d923f055e030051c9ab751440c6fdb4d362c251b0f1fc9d32434f0"
+    },
+    "luchai": {
+      "url": "/audio/rage-of-magic/sounds/luchai.wav",
+      "polyphony": 4,
+      "sha256": "db43d31b271e590d5b7046eb4039024e31e40e571df2b296e2dc8f20e6eeacc6"
+    },
+    "luchuu": {
+      "url": "/audio/rage-of-magic/sounds/luchuu.wav",
+      "polyphony": 4,
+      "sha256": "db689e9926b23e643a99f936a517788e7d3808c08dce91b5c87030fdc4a4c5e1"
+    },
+    "lucwin": {
+      "url": "/audio/rage-of-magic/sounds/lucwin.wav",
+      "polyphony": 4,
+      "sha256": "39352d703652554ffd31adbe8a6f81e59d339a767fbe6d4a81d12ff8ff615d54"
+    },
+    "magedie": {
+      "url": "/audio/rage-of-magic/sounds/magedie.wav",
+      "polyphony": 4,
+      "sha256": "7b9f5448c8f021addba5def48461d74aa51c2f36c4a670ff0d12a30bf052c10f"
+    },
+    "movestone": {
+      "url": "/audio/rage-of-magic/sounds/movestone.wav",
+      "polyphony": 4,
+      "sha256": "4de8cbecbc300df4ffb547d18067c857b5a229bb9a825db22cf8d1361e5d04f4"
+    },
+    "mwadada": {
+      "url": "/audio/rage-of-magic/sounds/mwadada.wav",
+      "polyphony": 4,
+      "sha256": "05d3ecefc1eb04dbda6f631b9fae5459e317d23cea9c869e4f91a2985147e05c"
+    },
+    "mwadie": {
+      "url": "/audio/rage-of-magic/sounds/mwadie.wav",
+      "polyphony": 4,
+      "sha256": "823804ec667df2f98583a73bdbb17815203d73b6b06b14feaa2f947dcee26eae"
+    },
+    "mwagun": {
+      "url": "/audio/rage-of-magic/sounds/mwagun.wav",
+      "polyphony": 4,
+      "sha256": "4ee32ba2d2bf8e33c9fca4a2956e6f00f72148553889b0c523e11f058177ae20"
+    },
+    "mwahya": {
+      "url": "/audio/rage-of-magic/sounds/mwahya.wav",
+      "polyphony": 4,
+      "sha256": "0c7aff6646d0801d844a1ee0f0bd8cb34de0b78603b73dba23369c95bd096c90"
+    },
+    "mwasup": {
+      "url": "/audio/rage-of-magic/sounds/mwasup.wav",
+      "polyphony": 4,
+      "sha256": "5a8dd4d33316e1ecdd5dcfe8bee6ec8167bd01add1281849573d399d03e8daf7"
+    },
+    "mwayaa": {
+      "url": "/audio/rage-of-magic/sounds/mwayaa.wav",
+      "polyphony": 4,
+      "sha256": "ef0fad13a8db34a90f51530a9bb764fac72ff0dbfc720422229faa43ff5cdd19"
+    },
+    "orcdie": {
+      "url": "/audio/rage-of-magic/sounds/orcdie.wav",
+      "polyphony": 4,
+      "sha256": "195def3c5e718288cdf73febf434db420b33a68c3edbda17c25c7ce072399117"
+    },
+    "pigdie": {
+      "url": "/audio/rage-of-magic/sounds/pigdie.wav",
+      "polyphony": 4,
+      "sha256": "3de73791f1236cd7682ea6f1f566ff2fcc5b8c4fc3c03ae6ea48ced07ffc3f9d"
+    },
+    "pigsnort": {
+      "url": "/audio/rage-of-magic/sounds/pigsnort.wav",
+      "polyphony": 4,
+      "sha256": "6bc02d3bbba10d399823053eaf033adb6bcdce2706fa684f7fbbf48ec49f3660"
+    },
+    "puckdie": {
+      "url": "/audio/rage-of-magic/sounds/puckdie.wav",
+      "polyphony": 4,
+      "sha256": "dea1626e72283e926c60c96161cad7e1d26bbb14a6cc22fc2eb80f7f7b5a62d0"
+    },
+    "puckha": {
+      "url": "/audio/rage-of-magic/sounds/puckha.wav",
+      "polyphony": 4,
+      "sha256": "c2d16fbf919e93aa42f6d11b3d69b16e63f660fe3808edf3657ec79b2cfcd9f5"
+    },
+    "puckhaha": {
+      "url": "/audio/rage-of-magic/sounds/puckhaha.wav",
+      "polyphony": 4,
+      "sha256": "95b3d94af0a6ac1430f56a9d3afd16b1a56d540c782fbf9bc294cfbb4e52350e"
+    },
+    "ress": {
+      "url": "/audio/rage-of-magic/sounds/ress.wav",
+      "polyphony": 4,
+      "sha256": "68991a1c0d4d3602edd40fd52626e7852ea44ea790d47315e04e94b493665209"
+    },
+    "sdadie": {
+      "url": "/audio/rage-of-magic/sounds/sdadie.wav",
+      "polyphony": 4,
+      "sha256": "96342e0b9bd44cc9a0d6d412c122cd4b36049c8d48ef69f890f5ba065f25bba5"
+    },
+    "sdahmm": {
+      "url": "/audio/rage-of-magic/sounds/sdahmm.wav",
+      "polyphony": 4,
+      "sha256": "004559ce1ba8ea59a66f411d566264a132f5ec539cb2671ccc72a892a1a6ce59"
+    },
+    "sdahoi": {
+      "url": "/audio/rage-of-magic/sounds/sdahoi.wav",
+      "polyphony": 4,
+      "sha256": "d90fe097d597ada70fa9f5a9be09c93b3361203c8b674e8c8d69375df0a31506"
+    },
+    "serpbite": {
+      "url": "/audio/rage-of-magic/sounds/serpbite.wav",
+      "polyphony": 4,
+      "sha256": "503dcbe8113b23682da6c062dfd3c774103958d4c92a2f0e1ab241f4cf0c2eae"
+    },
+    "serpdie": {
+      "url": "/audio/rage-of-magic/sounds/serpdie.wav",
+      "polyphony": 4,
+      "sha256": "ff199bd8515cbb3a4f7268357d504275e702d664d49beb618c50973419789417"
+    },
+    "splat": {
+      "url": "/audio/rage-of-magic/sounds/splat.wav",
+      "polyphony": 4,
+      "sha256": "dc3c96afe4badeced9d543cfd4f0e6b044a55ab4d2c93ce5429febee1a2601c9"
+    },
+    "streak": {
+      "url": "/audio/rage-of-magic/sounds/streak.wav",
+      "polyphony": 4,
+      "sha256": "2c85ce0a6b2eecb45545a2a6e25fcb49d0050ffcfaa45bb8e67a432e78f766cc"
+    },
+    "throw": {
+      "url": "/audio/rage-of-magic/sounds/throw.wav",
+      "polyphony": 4,
+      "sha256": "7de06f1bf9ee4605f46744ed7b8eb21d012a610784c2e0efaf1d5f39578fbde1"
+    },
+    "ting": {
+      "url": "/audio/rage-of-magic/sounds/ting.wav",
+      "polyphony": 4,
+      "sha256": "a2a4d574a7084c3ae56e6b0f000b41ffa9cd8b3aa5d0dd17c6bd32ccfe071598"
+    },
+    "tomdie": {
+      "url": "/audio/rage-of-magic/sounds/tomdie.wav",
+      "polyphony": 4,
+      "sha256": "aa647895b65944223b0ffb6481d26b1b692c577def4900abec9454b1e96e88e3"
+    },
+    "tomhaa": {
+      "url": "/audio/rage-of-magic/sounds/tomhaa.wav",
+      "polyphony": 4,
+      "sha256": "3fe3431956fe2a40914ac72c951191d8049848795bc0f9b5b9e2847fad88872e"
+    },
+    "tomvf": {
+      "url": "/audio/rage-of-magic/sounds/tomvf.wav",
+      "polyphony": 4,
+      "sha256": "0afc9c72f82a7110858170c35ec2d3c38c715506b5bd3eeb284c8c1fd83b0551"
+    },
+    "tomvg": {
+      "url": "/audio/rage-of-magic/sounds/tomvg.wav",
+      "polyphony": 4,
+      "sha256": "774a90d740bb174f17bca3433dd306a5e2cb166c6e27e4f3cd9cd749b8989977"
+    },
+    "tong": {
+      "url": "/audio/rage-of-magic/sounds/tong.wav",
+      "polyphony": 4,
+      "sha256": "9a88a86a871f04d3f1865ccec1b08d931c536d96649ee4bf06765cc8b6025c01"
+    },
+    "trolldie": {
+      "url": "/audio/rage-of-magic/sounds/trolldie.wav",
+      "polyphony": 4,
+      "sha256": "9f554d376252a45122a5c3b07def47ea27231a83507b94f9aec137b705e07d23"
+    },
+    "trollsky": {
+      "url": "/audio/rage-of-magic/sounds/trollsky.wav",
+      "polyphony": 4,
+      "sha256": "b25890ee1238df0aa0065e8831ab6450e90e5c7aa2341a1ba8a06dff642e78bc"
+    },
+    "unsheath": {
+      "url": "/audio/rage-of-magic/sounds/unsheath.wav",
+      "polyphony": 4,
+      "sha256": "7a7753e566be791ff0b20dc1db1cfe89794b3b88a20e6dea6ffdffc9f5ceb188"
+    },
+    "unsheath2": {
+      "url": "/audio/rage-of-magic/sounds/unsheath2.wav",
+      "polyphony": 4,
+      "sha256": "56990c9f9301575495846d7ba0a127abaffb1fcb065bc55d99b6814f1a398f5c"
+    },
+    "warning": {
+      "url": "/audio/rage-of-magic/sounds/warning.wav",
+      "polyphony": 4,
+      "sha256": "3e22fd57ffee273eaf7ac0874210f5945e934a3bf1a9ccd1074ea9e873624342"
+    },
+    "warp": {
+      "url": "/audio/rage-of-magic/sounds/warp.wav",
+      "polyphony": 4,
+      "sha256": "8f564742a09c68410a10d705bd28e9b237b93da69cb26bce983ccd791a0e612a"
+    },
+    "whip": {
+      "url": "/audio/rage-of-magic/sounds/whip.wav",
+      "polyphony": 4,
+      "sha256": "d5610003c7e2f2804dd6fe69e09427afc5952c160b6fa0f9b2ae126a5c394861"
+    },
+    "wiffhi": {
+      "url": "/audio/rage-of-magic/sounds/wiffhi.wav",
+      "polyphony": 4,
+      "sha256": "9334b33f140db2b560ddb5bdc3ceabf5ddc11054e9358940d8da407826f5b5ec"
+    },
+    "wifflo": {
+      "url": "/audio/rage-of-magic/sounds/wifflo.wav",
+      "polyphony": 4,
+      "sha256": "7c8ab452d73a5b7b7d42260db267ed59a43ccfd16b098d6f70466679426770f8"
+    },
+    "wiffmid": {
+      "url": "/audio/rage-of-magic/sounds/wiffmid.wav",
+      "polyphony": 4,
+      "sha256": "43d5c80e943cb362b258261cee8a574cb364731561555bfce2f159a5e95754de"
+    },
+    "wolfbite": {
+      "url": "/audio/rage-of-magic/sounds/wolfbite.wav",
+      "polyphony": 4,
+      "sha256": "db0b34c10388cb4ab991700f1a76fe03d326812c03032a5c8a60c37a6864638a"
+    },
+    "wolfdie": {
+      "url": "/audio/rage-of-magic/sounds/wolfdie.wav",
+      "polyphony": 4,
+      "sha256": "18c7317dd0802ee4e785150ce44e002b759f62533ed225194c16d3fb0cd20a00"
+    },
+    "wolfhowl": {
+      "url": "/audio/rage-of-magic/sounds/wolfhowl.wav",
+      "polyphony": 4,
+      "sha256": "52bd64fee4eb8346de83f8a4f0baec3f89aafb2f5f461da4999aa8f1791f8409"
+    },
+    "wooddie": {
+      "url": "/audio/rage-of-magic/sounds/wooddie.wav",
+      "polyphony": 4,
+      "sha256": "2d3f064d9a3dce2f76c3b820cfbe52785945030e5f072795fbe9123d6bb2d728"
+    },
+    "wrencorp": {
+      "url": "/audio/rage-of-magic/sounds/wrencorp.wav",
+      "polyphony": 4,
+      "sha256": "2406b35e482d7e36b2d0a347892fb1472790a6c4ad86c64157776eae512638a2"
+    },
+    "wrendie": {
+      "url": "/audio/rage-of-magic/sounds/wrendie.wav",
+      "polyphony": 4,
+      "sha256": "dddef2e12805168a014678d4b984a7c8d35a9504e25d26aa2d7f39e95ec75f81"
+    },
+    "wrengrav": {
+      "url": "/audio/rage-of-magic/sounds/wrengrav.wav",
+      "polyphony": 4,
+      "sha256": "b814dd353d6ba0d2bb339fff147dea6d2f214fa6a8534016bfee19d32186c185"
+    },
+    "wrenhaha": {
+      "url": "/audio/rage-of-magic/sounds/wrenhaha.wav",
+      "polyphony": 4,
+      "sha256": "12293909af2e5d82832b5067d754b1e5a88217cd76c7f81a53e13fcafbce603c"
+    },
+    "wrenstrk": {
+      "url": "/audio/rage-of-magic/sounds/wrenstrk.wav",
+      "polyphony": 4,
+      "sha256": "85fdda3b3a6da4fbb4419d0abd158d29e1bb33e0d5885610bc6d2ad7989b4080"
+    },
+    "wrenuf": {
+      "url": "/audio/rage-of-magic/sounds/wrenuf.wav",
+      "polyphony": 4,
+      "sha256": "8e7356ae4c41ae53d15bde125800c8633703b2e76d891d7abcbeebb4cac9d08b"
+    },
+    "wrenug": {
+      "url": "/audio/rage-of-magic/sounds/wrenug.wav",
+      "polyphony": 4,
+      "sha256": "79504d6340c108ce1d491ac25992472d5ca9af199f15f4baa127c8988c92bcfd"
+    },
+    "wrenuus": {
+      "url": "/audio/rage-of-magic/sounds/wrenuus.wav",
+      "polyphony": 4,
+      "sha256": "a732f71ed68e1d74661d3833a90630b3b44ebec0e6e0419f2c3a78a7915015ca"
+    },
+    "wrenvas": {
+      "url": "/audio/rage-of-magic/sounds/wrenvas.wav",
+      "polyphony": 4,
+      "sha256": "2e047d8ca33e47c5f95c29d542340dd39f295c6188982cfebed6ee03be177c45"
+    },
+    "wrenvf": {
+      "url": "/audio/rage-of-magic/sounds/wrenvf.wav",
+      "polyphony": 4,
+      "sha256": "0f5184d1cb6005cf624ac3f659b0a6f29f8733901bef6e4e74817eb95d9d6fdd"
+    },
+    "wrenvg": {
+      "url": "/audio/rage-of-magic/sounds/wrenvg.wav",
+      "polyphony": 4,
+      "sha256": "c50f7f35cb80c7a26c4cfade7c82546f2cef504801707fe004ad5e607ec84113"
+    },
+    "zap": {
+      "url": "/audio/rage-of-magic/sounds/zap.wav",
+      "polyphony": 4,
+      "sha256": "7db2a8ebd0464ba85749d289b5180f4a137933222f8da771b339fb356556c946"
+    }
+  }
+}

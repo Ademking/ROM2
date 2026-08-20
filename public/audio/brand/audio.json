@@ -1,0 +1,10 @@
+{
+  "game": "drillion-retro",
+  "sounds": {
+    "drillion-retro-startup": {
+      "url": "/audio/rage-of-magic/sounds/006a.wav",
+      "polyphony": 1,
+      "sha256": "f4d0086f25ae0e6675a1c42ca838a135f478c6be864d81597d9ec471da854c4a"
+    }
+  }
+}

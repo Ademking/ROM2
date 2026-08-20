@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Drillion Retro">
+  <defs>
+    <linearGradient id="retro-green" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#dcff27"/>
+      <stop offset="0.48" stop-color="#a7f700"/>
+      <stop offset="1" stop-color="#4ed400"/>
+    </linearGradient>
+    <linearGradient id="chrome" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.55" stop-color="#f7f8f9"/>
+      <stop offset="1" stop-color="#aebbc2"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="2.5" y="2.5" width="59" height="59" rx="13" fill="#11100f" stroke="#b62aff" stroke-width="3"/>
+  <path d="M5 52.5h54" fill="none" stroke="#ff2ecb" stroke-width="3" stroke-linecap="round"/>
+
+  <path
+    d="M8 19h10.5C26 19 30 24 30 32s-4 13-11.5 13H8V19Zm7 7v12h3c3.2 0 4.8-2 4.8-6s-1.6-6-4.8-6h-3Z"
+    fill="url(#chrome)"
+    fill-rule="evenodd"
+    stroke="#080807"
+    stroke-width="3"
+    stroke-linejoin="round"
+    paint-order="stroke fill"
+  />
+
+  <path
+    d="M29 12h11.5C50 12 55 17.2 55 25.5c0 5.8-2.7 10-7.5 12.1L56 50H44.5l-7-10.5H37V50H26V16c0-2.2 1-4 3-4Zm8 9v10h3.2c3 0 4.6-1.8 4.6-5s-1.6-5-4.6-5H37Z"
+    fill="none"
+    fill-rule="evenodd"
+    stroke="#7c20ee"
+    stroke-width="8"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M29 12h11.5C50 12 55 17.2 55 25.5c0 5.8-2.7 10-7.5 12.1L56 50H44.5l-7-10.5H37V50H26V16c0-2.2 1-4 3-4Zm8 9v10h3.2c3 0 4.6-1.8 4.6-5s-1.6-5-4.6-5H37Z"
+    fill="url(#retro-green)"
+    fill-rule="evenodd"
+    stroke="#080807"
+    stroke-width="4"
+    stroke-linejoin="round"
+    paint-order="stroke fill"
+  />
+  <path d="M34 17.5c4.5-1.2 10.6-.5 13.2 2.8" fill="none" stroke="#f5ffd7" stroke-width="2.2" stroke-linecap="round" opacity=".9"/>
+</svg>

@@ -1,0 +1,104 @@
+:root {
+  color-scheme: dark;
+  --ink: #e8e4dc;
+  --gold: #e8b34a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  background: #05060a;
+  color: var(--ink);
+  font:
+    14px/1.5 ui-sans-serif,
+    system-ui,
+    sans-serif;
+}
+
+#game {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 16px;
+}
+
+/* 512x384 is 4:3; cap the frame by whichever of width or height runs out first. */
+.game-frame {
+  position: relative;
+  width: min(100%, (100vh - 32px) * 4 / 3);
+  aspect-ratio: 4 / 3;
+}
+
+.canvas-host {
+  display: grid;
+  height: 100%;
+  place-items: center;
+  background: #000;
+}
+
+.canvas-host canvas {
+  display: block;
+}
+
+.cover {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  gap: 12px;
+  place-content: center;
+  place-items: center;
+  padding: 24px;
+  background: rgba(5, 6, 10, 0.92);
+  text-align: center;
+}
+
+.cover[hidden] {
+  display: none;
+}
+
+.cover strong {
+  color: var(--gold);
+  font-size: 16px;
+}
+
+.cover span {
+  color: #9a958c;
+}
+
+.cover button {
+  padding: 10px 22px;
+  border: 1px solid var(--gold);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--gold);
+  font: inherit;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.cover button:hover {
+  background: var(--gold);
+  color: #05060a;
+}
+
+.loader {
+  width: 22px;
+  height: 22px;
+  border: 2px solid #2a2c34;
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
