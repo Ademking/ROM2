@@ -86,7 +86,7 @@ function showStartCover() {
 }
 
 async function boot() {
-  showCover('loading-cover', '<span class="loader"></span>Decoding the 1.47 archive…');
+  showCover('loading-cover', '<span class="loader"></span>Decoding the archive…');
 
   app = new Application();
   await app.init({
@@ -109,7 +109,7 @@ async function boot() {
   game = new RageOfMagicGame({
     pixelPerfect,
     renderer: app.renderer,
-    onStateChange: () => {},
+    onStateChange: () => { },
     onOpenHighScores: (url) => window.open(url, '_blank', 'noopener,noreferrer'),
   });
   app.stage.addChild(game.root);
@@ -128,8 +128,7 @@ async function boot() {
 function showError(error) {
   showCover(
     'error-cover',
-    `<strong>Couldn’t start Rage of Magic II.</strong><span>${
-      error instanceof Error ? error.message : 'The game could not be loaded.'
+    `<strong>Couldn’t start Rage of Magic II.</strong><span>${error instanceof Error ? error.message : 'The game could not be loaded.'
     }</span>`,
   );
 }

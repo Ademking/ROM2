@@ -13,15 +13,15 @@ const PRESENTS_SCREEN = {
 function editionInfo(s) {
   return s
     ? {
-        version: 'Full v1.47',
-        owner: null,
-        registrationFont: 1,
-      }
+      version: 'Community v1.0',
+      owner: null,
+      registrationFont: 1,
+    }
     : {
-        version: 'Trial v1.47',
-        owner: 'Trial Version',
-        registrationFont: 5,
-      };
+      version: 'Trial v1.47',
+      owner: 'Trial Version',
+      registrationFont: 5,
+    };
 }
 function brandHue(s) {
   const e = Math.max(0, Math.min(20, Math.trunc(s)));
